@@ -469,7 +469,7 @@ public class JointOverlapAnalysisGUI extends JPanel{
                 	
                 	if (valid) {
                 		
-                		if (dataStructureColumn.getSelectedItem().toString() == Commons.INDEXED_SEGMENT_TREE_FOREST) {
+                		if (dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.INDEXED_SEGMENT_TREE_FOREST)) {
 
         					JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
         							preset,
@@ -477,18 +477,16 @@ public class JointOverlapAnalysisGUI extends JPanel{
         							1,
         							intervalSetFiles.size(),
         							intervalSetFilesArray,
-        							null,
         							numberofPercent,
         							SearchMethod.NOT_SET,
         							OutputType.ONLY_RESULTING_INTERVAL);
 
-                        } else if (dataStructureColumn.getSelectedItem().toString() == Commons.SEGMENT_TREE) {
+                        } else if (dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.SEGMENT_TREE)) {
                         	
                         	JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree(
                 					1,
                 					intervalSetFiles.size(),
         							intervalSetFilesArray,
-                					null,
                 					OutputType.ONLY_RESULTING_INTERVAL);
 
                         }
@@ -781,7 +779,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
 							joa.numberofRepetitions,
 							joa.filenames.size(),
 							filesArray,
-							null,
 							joa.percentage,
 							SearchMethod.NOT_SET,
 							outputType);
@@ -794,7 +791,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
 							joa.numberofRepetitions,
 							joa.filenames.size(),
 							filesArray,
-							null,
 							joa.percentage,
 							SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED,
 							outputType);
@@ -806,7 +802,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
         					joa.numberofRepetitions,
         					joa.filenames.size(),
         					filesArray,
-        					null,
         					outputType);
 
 					

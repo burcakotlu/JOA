@@ -1557,8 +1557,7 @@ public class SegmentTree {
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames,
 			int numberofPercent,
-			SearchMethod searchMethod,
-			BufferedWriter bufferedWriter){
+			SearchMethod searchMethod){
 		
 		return FORK_JOIN_POOL.invoke(new FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_ResultingIntervalOnly(
 				presetValue,
@@ -1567,8 +1566,7 @@ public class SegmentTree {
 				intervalSetsFileNames.length-1,
 				intervalSetsFileNames,
 				numberofPercent,
-				searchMethod,
-				bufferedWriter));	
+				searchMethod));	
 		
 		
 		
@@ -1615,14 +1613,12 @@ public class SegmentTree {
 	//DEC 15, 2017, starts	
 	public static TIntObjectMap<List<Interval>> findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
 			int numberofIntervalSetInputFiles,
-			String[] intervalSetsFileNames,
-			BufferedWriter bufferedWriter) {
+			String[] intervalSetsFileNames) {
 				
 		return FORK_JOIN_POOL.invoke(new FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_SegmentTree_ResultingIntervalOnly(
 				0,
 				intervalSetsFileNames.length-1,
-				intervalSetsFileNames,
-				bufferedWriter));	
+				intervalSetsFileNames));	
 				
 	}
 	//DEC 15, 2017, ends

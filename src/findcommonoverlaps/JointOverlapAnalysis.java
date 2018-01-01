@@ -437,43 +437,39 @@ public class JointOverlapAnalysis {
 	public static void constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_ResultingIntervalOnly(
 			int numberofRepetations,
 			int numberofIntervalSetInputFiles,
-			String[] intervalSetsFileNames,
-			BufferedWriter bufferedWriter) throws IOException {
+			String[] intervalSetsFileNames) throws IOException {
 		
 		//Overlapping Intervals found by Indexed Segment Tree Forest
 		TIntObjectMap<List<Interval>> chrNumber2ResultingIntervalListMap = null;
 				
-		long startTime1, startTime2, readConstructSearchTime, writeOutputTime, totalTime;
+		//long startTime1, startTime2, readConstructSearchTime, writeOutputTime, totalTime;
 			
 		SegmentTree.createForkJoinPool();
 		
-		for(int i=0; i < numberofRepetations; i++){
+//		for(int i=0; i < numberofRepetations; i++){
 			
-			startTime1 = System.nanoTime();		
+			//startTime1 = System.nanoTime();		
 			//Keeps list of overlapping intervals and their common overlap
 			chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
 					numberofIntervalSetInputFiles,
-					intervalSetsFileNames,
-					bufferedWriter);				
-			readConstructSearchTime = System.nanoTime()-startTime1;
+					intervalSetsFileNames);				
+			//readConstructSearchTime = System.nanoTime()-startTime1;
 					
 			
-			startTime2 = System.nanoTime();		
+			//startTime2 = System.nanoTime();		
 			//write to std out
 			writeToStdOut(chrNumber2ResultingIntervalListMap);		
-			writeOutputTime = System.nanoTime()-startTime2;
+			//writeOutputTime = System.nanoTime()-startTime2;
 			
-			totalTime = System.nanoTime()-startTime1;
-			bufferedWriter.write("SegmentTree" + "\t" +(i+1) + "\t" + readConstructSearchTime/Commons.ONE_MILLION_FLOAT + "\t" + writeOutputTime/Commons.ONE_MILLION_FLOAT + "\t" + totalTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));
-			
+			//totalTime = System.nanoTime()-startTime1;
+			//bufferedWriter.write("SegmentTree" + "\t" +(i+1) + "\t" + readConstructSearchTime/Commons.ONE_MILLION_FLOAT + "\t" + writeOutputTime/Commons.ONE_MILLION_FLOAT + "\t" + totalTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));			
 			chrNumber2ResultingIntervalListMap= null;
 		
-		}//End of for each repetition
+//		}//End of for each repetition
 		
-		bufferedWriter.write("##########################################################################" + System.getProperty("line.separator"));
+		//bufferedWriter.write("##########################################################################" + System.getProperty("line.separator"));
 			
 		SegmentTree.shutdownForkJoinPool();		
-		//System.gc();  
 				
 	}
 	//DEC 15, 2017 ends
@@ -486,41 +482,34 @@ public class JointOverlapAnalysis {
 			int numberofRepetations,
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames,
-			BufferedWriter bufferedWriter,
 			OutputType outputType) throws IOException {
 		
 		//Overlapping Intervals found by Segment Tree
 		TIntObjectMap<List<List<Interval>>> chrNumber2OverlappingIntervalsListListMap = null;
 		
 				
-		long timeBefore = Long.MIN_VALUE;
-		long timeAfter = Long.MIN_VALUE;
+		//long timeBefore = Long.MIN_VALUE;
+		//long timeAfter = Long.MIN_VALUE;
 				
-		/***********************************************************************************************************/
+		/*********************************************************************************************/
 		/****************** Segment Tree starts*******************************************************/
-		/***********************************************************************************************************/			
-		long segmentTreeTotalTime = 0l;
-		long oneSegmentTreeTotalTime = 0l;
-		long lowestOneSegmentTreeTotalTime = Long.MAX_VALUE;
+		/*********************************************************************************************/			
+		//long segmentTreeTotalTime = 0l;
+		//long oneSegmentTreeTotalTime = 0l;
+		//long lowestOneSegmentTreeTotalTime = Long.MAX_VALUE;
 
-		//For JOA GUI comment this
-		if (bufferedWriter!=null) {
-			bufferedWriter.write("***************************************************" + System.getProperty("line.separator"));
-			bufferedWriter.flush();			
-		}
-		//For JOA GUI 
 		
 		//Segment Tree
-		for(int j=0; j < numberofRepetations; j++){
+//		for(int j=0; j < numberofRepetations; j++){
 			
 			//FOR JOA GUI have this
 			//JointOverlapAnalysis.appendNewTextToLogArea("Joint Overlap Analysis using Segment Tree started.");
 			//FOR JOA GUI
 			
 			//Initialize
-			oneSegmentTreeTotalTime=0l;
+			//oneSegmentTreeTotalTime=0l;
 			
-			timeBefore = System.currentTimeMillis();
+			//timeBefore = System.currentTimeMillis();
 			
 			SegmentTree.createForkJoinPool();
 							
@@ -531,41 +520,24 @@ public class JointOverlapAnalysis {
 			
 			SegmentTree.shutdownForkJoinPool();
 
-			timeAfter = System.currentTimeMillis();				
-			segmentTreeTotalTime += timeAfter-timeBefore;
+			//timeAfter = System.currentTimeMillis();				
+			//segmentTreeTotalTime += timeAfter-timeBefore;
 			
-			oneSegmentTreeTotalTime = timeAfter-timeBefore;
+			//oneSegmentTreeTotalTime = timeAfter-timeBefore;
 			
-			if(oneSegmentTreeTotalTime < lowestOneSegmentTreeTotalTime) {
-				lowestOneSegmentTreeTotalTime = oneSegmentTreeTotalTime;
-			}
+//			if(oneSegmentTreeTotalTime < lowestOneSegmentTreeTotalTime) {
+//				lowestOneSegmentTreeTotalTime = oneSegmentTreeTotalTime;
+//			}
 
-			//For JOA GUI comment this
-			if (bufferedWriter!=null) {
-				bufferedWriter.write("For each repetion: "+ j +" ConstructSearch_Parallel_FileBased_ChromBased_SegmentTree" + "\t" + "" + "\t" + "" + "\t" + (oneSegmentTreeTotalTime*1.0f) + "\t" + "presetValue" + "\t" + numberofRepetations + "\t" + numberofIntervalSetInputFiles + "\t" + "IndexingLevelDecisionMode"  + System.getProperty("line.separator"));
-				bufferedWriter.flush();
-			}
-			//For JOA GUI 
-			
-			
+						
 			//FOR JOA GUI have this
 			//JointOverlapAnalysis.appendNewTextToLogArea("Joint Overlap Analysis using Segment Tree ended.");
 			//FOR JOA GUI
 
-			//System.gc(); 
 										
-		}//End of number of repetitions
+//		}//End of number of repetitions
 										
-		//For JOA GUI comment this
-		if (bufferedWriter!=null) {			
-			bufferedWriter.write("ConstructSearch_Parallel_FileBased_ChromBased_SegmentTree Avg Total Runtime:" + "\t" + "" + "\t" + "" + "\t" + (segmentTreeTotalTime*1.0f)/numberofRepetations + "\t" + "presetValue" + "\t" + numberofRepetations + "\t" + numberofIntervalSetInputFiles + "\t" + "IndexingLevelDecisionMode"  + System.getProperty("line.separator"));
-			bufferedWriter.write("ConstructSearch_Parallel_FileBased_ChromBased_SegmentTree Min Runtime: " + "\t" + "" + "\t" + "" + "\t" + lowestOneSegmentTreeTotalTime + "\t" + "presetValue" + "\t" + numberofRepetations + "\t" + numberofIntervalSetInputFiles + "\t" + "IndexingLevelDecisionMode"  + System.getProperty("line.separator"));
-			bufferedWriter.write("***************************************************" + System.getProperty("line.separator"));
-			bufferedWriter.flush();
-		}
-		//For JOA GUI 
-		
-		
+				
 		//For JOA GUI have this
 		//String userWorkingDirectory = System.getProperty("user.dir");
 		//JointOverlapAnalysis.appendNewTextToLogArea("Output is provided under " + userWorkingDirectory + System.getProperty("file.separator") + "JointlyOverlappingIntervals.txt");
@@ -575,7 +547,7 @@ public class JointOverlapAnalysis {
 
 
 		//Debugging starts
-		//Write overlapping intervals to file
+		//Write overlapping intervals to stdout
 		writeToStdOut(chrNumber2OverlappingIntervalsListListMap,intervalSetsFileNames.length,outputType);
 		//Debugging ends											
 		/***********************************************************************************************************/
@@ -593,20 +565,20 @@ public class JointOverlapAnalysis {
 			int numberofRepetations,
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames,
-			BufferedWriter bufferedWriter,
+			//BufferedWriter bufferedWriter,
 			int numberofPercent,
 			SearchMethod searchMethod) throws IOException {
 				
 		//Overlapping Intervals found by Indexed Segment Tree Forest
 		TIntObjectMap<List<Interval>> chrNumber2ResultingIntervalListMap = null;
 		
-		long startTime1, startTime2, readConstructSearchTime, writeOutputTime, totalTime;
+		//long startTime1, startTime2, readConstructSearchTime, writeOutputTime, totalTime;
 				
 		SegmentTree.createForkJoinPool();
 		
-		for(int i=0; i < numberofRepetations; i++){
+//		for(int i=0; i < numberofRepetations; i++){
 			
-			startTime1 = System.nanoTime();		
+			//startTime1 = System.nanoTime();		
 			//Keeps list of overlapping intervals and their common overlap
 			//bufferedWriter is added for debug
 			chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
@@ -615,33 +587,31 @@ public class JointOverlapAnalysis {
 					numberofIntervalSetInputFiles,
 					intervalSetsFileNames,
 					numberofPercent,
-					searchMethod,
-					bufferedWriter);
-			readConstructSearchTime = System.nanoTime()-startTime1;
+					searchMethod);
+			//readConstructSearchTime = System.nanoTime()-startTime1;
 			
-			startTime2 = System.nanoTime();					
+			//startTime2 = System.nanoTime();					
 			//write to std out
 			writeToStdOut(chrNumber2ResultingIntervalListMap);
-			writeOutputTime = System.nanoTime()-startTime2;
+			//writeOutputTime = System.nanoTime()-startTime2;
 			
-			totalTime = System.nanoTime()-startTime1;
-			
-			if (searchMethod.isNOT_SET()) {
-				bufferedWriter.write("IndexedSegmentTreeForest" + "\t" + presetValue + "\t" + readConstructSearchTime/Commons.ONE_MILLION_FLOAT + "\t" + writeOutputTime/Commons.ONE_MILLION_FLOAT + "\t" + totalTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));
-			} else if (searchMethod.isUSING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED()) {
-				bufferedWriter.write("IndexedSegmentTreeForest_STAR" + "\t" + presetValue + "\t" + readConstructSearchTime/Commons.ONE_MILLION_FLOAT + "\t" + writeOutputTime/Commons.ONE_MILLION_FLOAT + "\t" + totalTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));
-			}				
-			
-			
+			//totalTime = System.nanoTime()-startTime1;
+
+//			//for runtime searchtime analysis
+//			if (searchMethod.isNOT_SET()) {
+//				bufferedWriter.write("IndexedSegmentTreeForest" + "\t" + presetValue + "\t" + readConstructSearchTime/Commons.ONE_MILLION_FLOAT + "\t" + writeOutputTime/Commons.ONE_MILLION_FLOAT + "\t" + totalTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));
+//			} else if (searchMethod.isUSING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED()) {
+//				bufferedWriter.write("IndexedSegmentTreeForest_STAR" + "\t" + presetValue + "\t" + readConstructSearchTime/Commons.ONE_MILLION_FLOAT + "\t" + writeOutputTime/Commons.ONE_MILLION_FLOAT + "\t" + totalTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));
+//			}				
+						
 			chrNumber2ResultingIntervalListMap= null;
 			
-		}//End of for each repetition
+//		}//End of for each repetition
 		
-		bufferedWriter.write("##########################################################################" + System.getProperty("line.separator"));
+//		bufferedWriter.write("##########################################################################" + System.getProperty("line.separator"));
 
 			
 		SegmentTree.shutdownForkJoinPool();
-		//System.gc();  
 		
 	}	
 	//DEC 14, 2017 ends
@@ -654,7 +624,6 @@ public class JointOverlapAnalysis {
 			int numberofRepetations,
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames,
-			BufferedWriter bufferedWriter,
 			int numberofPercent,
 			SearchMethod searchMethod,
 			OutputType outputType) throws IOException {	
@@ -662,38 +631,29 @@ public class JointOverlapAnalysis {
 		//Overlapping Intervals found by Indexed Segment Tree Forest
 		TIntObjectMap<List<List<Interval>>> chrNumber2OverlappingIntervalsListListMap = null;
 					
-		long timeBefore = Long.MIN_VALUE;
-		long timeAfter = Long.MIN_VALUE;
+		//long timeBefore = Long.MIN_VALUE;
+		//long timeAfter = Long.MIN_VALUE;
 				
 		/***********************************************************************************************************/
 		/******************Indexed Segment Tree Forest starts*******************************************************/
 		/***********************************************************************************************************/			
-		long indexedSegmentTreeForestTotalTime = 0l;
-		long forOnceIndexedSegmentTreeForestTotalTime = 0l;
-		long lowestOneIndexedSegmentTreeForestTotalTime = Long.MAX_VALUE;
+		//long indexedSegmentTreeForestTotalTime = 0l;
+		//long forOnceIndexedSegmentTreeForestTotalTime = 0l;
+		//long lowestOneIndexedSegmentTreeForestTotalTime = Long.MAX_VALUE;
 		
-		//For JOA GUI comment this
-		if (bufferedWriter!=null) {
-			bufferedWriter.write("***************************************************" + System.getProperty("line.separator"));
-			bufferedWriter.flush();			
-		}
-		//For JOA GUI
 				
 		//Indexed Segment Tree Forest
-		for(int j=0; j < numberofRepetations; j++){
+//		for(int j=0; j < numberofRepetations; j++){
 			
 			//FOR JOA GUI Have this
 			//JointOverlapAnalysis.appendNewTextToLogArea("Joint Overlap Analysis using Indexed Segment Tree Forest started.");
 			//FOR JOA GUI
 			
-			//Debug starts
-			//System.out.println("Indexed Segment Tree Forest Repetition: " +  j + " " + mode.convertEnumtoString() + " starts+++++++++++++++++++++++++++++");
-			//Debug ends
 			
 			//Initialize
-			forOnceIndexedSegmentTreeForestTotalTime=0l;
+			//forOnceIndexedSegmentTreeForestTotalTime=0l;
 			
-			timeBefore = System.nanoTime();	
+			//timeBefore = System.nanoTime();	
 			
 			SegmentTree.createForkJoinPool();
 											
@@ -708,44 +668,23 @@ public class JointOverlapAnalysis {
 						
 			SegmentTree.shutdownForkJoinPool();
 
-			timeAfter = System.nanoTime();		
+			//timeAfter = System.nanoTime();		
 			
-			indexedSegmentTreeForestTotalTime += timeAfter-timeBefore;
+			//indexedSegmentTreeForestTotalTime += timeAfter-timeBefore;
 			
-			forOnceIndexedSegmentTreeForestTotalTime = timeAfter-timeBefore;
+			//forOnceIndexedSegmentTreeForestTotalTime = timeAfter-timeBefore;
 			
-			if (forOnceIndexedSegmentTreeForestTotalTime < lowestOneIndexedSegmentTreeForestTotalTime) {
-				lowestOneIndexedSegmentTreeForestTotalTime = forOnceIndexedSegmentTreeForestTotalTime;
-			}
-			
-			//For Analysis Have this
-			if (bufferedWriter!=null) {
-				bufferedWriter.write("For each repetion: "+ j +" ConstructSearch_Parallel_FileBased_ChromBased_IndexedSegmentTree" + "\t" + searchMethod.convertEnumtoString() + "\t" + "" + "\t" + (forOnceIndexedSegmentTreeForestTotalTime/Commons.ONE_MILLION_FLOAT) + "\t" + presetValue + "\t" + numberofRepetations + "\t" + numberofIntervalSetInputFiles + "\t" + mode.convertEnumtoString()  + System.getProperty("line.separator"));
-				bufferedWriter.flush();
-			}
-			//For Analysis Have this
-			
-			//debug starts
-			//System.out.println("Indexed Segment Tree Forest Repetition: " +  j + " " + mode.convertEnumtoString()  + " ends+++++++++++++++++++++++++++++");
-			//debug ends
-			
+//			if (forOnceIndexedSegmentTreeForestTotalTime < lowestOneIndexedSegmentTreeForestTotalTime) {
+//				lowestOneIndexedSegmentTreeForestTotalTime = forOnceIndexedSegmentTreeForestTotalTime;
+//			}
+									
 			//FOR JOA GUI Have this
 			//JointOverlapAnalysis.appendNewTextToLogArea("Joint Overlap Analysis using Indexed Segment Tree Forest ended.");
 			//FOR JOA GUI
 						
 							
-			 //System.gc();  
-		}//End of number of repetitions
-										
-		
-		//For JOA GUI comment this
-		if (bufferedWriter!=null) {
-			bufferedWriter.write("ConstructSearch_Parallel_FileBased_ChromBased_IndexedSegmentTree Avg Total Runtime:" + "\t" + "" + "\t" + "" + "\t" + (indexedSegmentTreeForestTotalTime/Commons.ONE_MILLION_FLOAT)/numberofRepetations + "\t" + presetValue + "\t" + numberofRepetations + "\t" + numberofIntervalSetInputFiles + "\t" + mode.convertEnumtoString()  + System.getProperty("line.separator"));
-			bufferedWriter.write("ConstructSearch_Parallel_FileBased_ChromBased_IndexedSegmentTree Min Runtime: " + "\t" + "" + "\t" + "" + "\t" + (lowestOneIndexedSegmentTreeForestTotalTime/Commons.ONE_MILLION_FLOAT) + "\t" + presetValue + "\t" + numberofRepetations + "\t" + numberofIntervalSetInputFiles + "\t" + mode.convertEnumtoString()  + System.getProperty("line.separator"));
-			bufferedWriter.write("***************************************************" + System.getProperty("line.separator"));
-			bufferedWriter.flush();
-		}
-		//For JOA GUI
+//		}//End of number of repetitions
+												
 		
 		//For JOA GUI Have this
 		//String userWorkingDirectory = System.getProperty("user.dir");
@@ -756,7 +695,7 @@ public class JointOverlapAnalysis {
 		
 		
 		//Debugging starts
-		//Write overlapping intervals to file
+		//Write overlapping intervals to stdout
 		writeToStdOut(chrNumber2OverlappingIntervalsListListMap,intervalSetsFileNames.length,outputType);
 		//Debugging ends				
 		
@@ -765,8 +704,7 @@ public class JointOverlapAnalysis {
 		/***********************************************************************************************************/
 		/******************Indexed Segment Tree Forest ends*********************************************************/
 		/***********************************************************************************************************/
-		
-		
+				
 	}	
 	//Nov 6, 2017 ends
 	
@@ -795,9 +733,9 @@ public class JointOverlapAnalysis {
 		return intervalSetFileNumber2ChrNumber2PresetValueMap;
 	}
 
-	/*****************************************/
-	/****Command  Line Parameter starts*******/
-	/*****************************************/
+	/*************************************************/
+	/****Command  Line Default Parameter starts*******/
+	/*************************************************/
     @Parameter(names={"--preset", "-p"})
     int preset=1000000;
     
@@ -814,10 +752,10 @@ public class JointOverlapAnalysis {
     String outputType = Commons.ONLY_RESULTING_INTERVAL;
 	
     @Parameter(names={"--tree", "-t"})
-    String treeType = Commons.INDEXED_SEGMENT_TREE_FOREST;
-	/*****************************************/
-	/****Command  Line Parameter ends*********/
-	/*****************************************/
+    String treeType = Commons.SEGMENT_TREE;
+	/*************************************************/
+	/****Command  Line Default Parameter ends*********/
+	/*************************************************/
 
 	
     public static void main(String[] args) {		
@@ -828,17 +766,16 @@ public class JointOverlapAnalysis {
         
         String[] filesArray = joa.filenames.toArray(new String[joa.filenames.size()]);
         
-        FileWriter fileWriter = null;
-		BufferedWriter bufferedWriter = null;
+        //FileWriter fileWriter = null;
+		//BufferedWriter bufferedWriter = null;
 		
 		try {
 			
-			fileWriter = new FileWriter("/home/burcak/Documents/JOA_Runtime_Comparisons/JOA_Runtimes.txt",true);
-			bufferedWriter = new BufferedWriter(fileWriter);
+			//fileWriter = new FileWriter("/home/burcak/Documents/JOA_Runtime_Comparisons/JOA_Runtimes.txt",true);
+			//bufferedWriter = new BufferedWriter(fileWriter);
 			
 			//HeaderLine
-			//bufferedWriter.write("##################################################################"+ System.getProperty("line.separator"));
-			
+			//bufferedWriter.write("##################################################################"+ System.getProperty("line.separator"));			
 			//bufferedWriter.write("ReadFromFileTime" + "\t" + "ConstructFromFileTime"+ "\t" + "SearchTime" + "\t"+ "DataStructure" + "\t" + "Repetition" + "\t" + "ReadConstructSearchTime" + "\t" + "WriteOutputTime" + "\t" + "TotalTime"+ System.getProperty("line.separator"));			
 			
 	        if (FileOperations.checkIntervalSetFileNamesStringArray(filesArray)) {
@@ -859,7 +796,6 @@ public class JointOverlapAnalysis {
 									joa.numberofRepetitions,
 									joa.filenames.size(),
 									filesArray,
-									bufferedWriter,
 									joa.percentage,
 									SearchMethod.NOT_SET);
 							break;
@@ -871,7 +807,6 @@ public class JointOverlapAnalysis {
 									joa.numberofRepetitions,
 									joa.filenames.size(),
 									filesArray,
-									bufferedWriter,
 									joa.percentage,
 									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED);
 							break;
@@ -880,8 +815,7 @@ public class JointOverlapAnalysis {
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_ResultingIntervalOnly(
 			    					joa.numberofRepetitions,
 			    					joa.filenames.size(),
-			    					filesArray,
-			    					bufferedWriter);
+			    					filesArray);
 							break;
 						
 						default:
@@ -903,7 +837,6 @@ public class JointOverlapAnalysis {
 								joa.numberofRepetitions,
 								joa.filenames.size(),
 								filesArray,
-								null,
 								joa.percentage,
 								SearchMethod.NOT_SET,
 								outputType);
@@ -917,7 +850,6 @@ public class JointOverlapAnalysis {
 									joa.numberofRepetitions,
 									joa.filenames.size(),
 									filesArray,
-									null,
 									joa.percentage,
 									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED,
 									outputType);
@@ -929,7 +861,6 @@ public class JointOverlapAnalysis {
 			    					joa.numberofRepetitions,
 			    					joa.filenames.size(),
 			    					filesArray,
-			    					null,
 			    					outputType);
 
 							break;
@@ -946,7 +877,7 @@ public class JointOverlapAnalysis {
 					
 			//Close bufferedWriter
 			//bufferedWriter.write("##################################################################"+ System.getProperty("line.separator"));
-			bufferedWriter.close();
+			//bufferedWriter.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

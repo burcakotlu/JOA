@@ -1,0 +1,199 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>JOA Tutorial &#8212; JOA 1.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Download" href="download.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="joa-tutorial">
+<h1>JOA Tutorial<a class="headerlink" href="#joa-tutorial" title="Permalink to this headline">¶</a></h1>
+<p>You can run JOA using its graphical user interface (GUI) or command line arguments.</p>
+<p>By double clicking the joa.jar you can open JOA’s GUI. In this case, GUI will be opened with default amount of memory allocated for JVM which is 256MB.
+In order to allocate specific amount of memory for joa.jar and run it through its GUI, one should write the following basic command on Terminal (Linux or Mac OS X) or on Command Prompt (Windows)*:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ java -Xms8G -Xmx8G −jar ~path/to/joa.jar
+</pre></div>
+</div>
+<p>Note that with this command above, 8GM of memory is allocated for joa.jar. Depending on the number of intervals in the sets and number of interval sets you may need to increase the memory accordingly.</p>
+<p>Throughout the guide, we will use <em>~path/to/joa.jar</em> to indicate your absolute path to <strong>joa.jar</strong>.</p>
+<div class="section" id="joa-graphical-user-interface">
+<h2>JOA Graphical User Interface<a class="headerlink" href="#joa-graphical-user-interface" title="Permalink to this headline">¶</a></h2>
+<p>JOA provides joint overlapping intervals of n interval sets.</p>
+<ol class="arabic">
+<li><p class="first"><strong>Input File Names</strong>: (Mandatory)</p>
+<p>You have to provide input files in bed format.</p>
+</li>
+<li><p class="first"><strong>Data Structure Type</strong>: (Optional)</p>
+<p>JOA finds overlapping intervals of n interval sets using Segment Tree and Indexed Segment Tree Forest.</p>
+<ul class="simple">
+<li><em>Segment Tree</em></li>
+<li><em>Indexed Segment Tree Forest</em></li>
+</ul>
+</li>
+<li><p class="first"><strong>Output Type</strong>: (Optional)</p>
+<p>JOA outputs the found overlapping intervals of n interval sets in two options.</p>
+<ul class="simple">
+<li><em>Only the resulting interval per each found overlap</em></li>
+<li><em>All the overlapping intervals and the resulting interval per each found overlap</em></li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="joa-command-line-interface-and-command-line-arguments">
+<h2>JOA Command-Line Interface and Command-Line Arguments<a class="headerlink" href="#joa-command-line-interface-and-command-line-arguments" title="Permalink to this headline">¶</a></h2>
+<p>In the following table, command-line arguments are specified.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="19%" />
+<col width="23%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Description</th>
+<th class="head">Parameter</th>
+<th class="head">Optional/Required</th>
+<th class="head">Default Parameter</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Input Files</td>
+<td><a class="reference internal" href="#f">-f</a></td>
+<td>Required</td>
+<td>None (“path/to/file”)</td>
+</tr>
+<tr class="row-odd"><td rowspan="2">Data Structure</td>
+<td rowspan="2"><a class="reference internal" href="#t">-t</a></td>
+<td rowspan="2">Optional</td>
+<td><a href="#id1"><span class="problematic" id="id2">`st`_</span></a></td>
+</tr>
+<tr class="row-even"><td><a href="#id3"><span class="problematic" id="id4">`istf`_</span></a></td>
+</tr>
+<tr class="row-odd"><td rowspan="2">Output</td>
+<td rowspan="2"><a class="reference internal" href="#o">-o</a></td>
+<td rowspan="2">Optional</td>
+<td><a href="#id5"><span class="problematic" id="id6">`all`_</span></a></td>
+</tr>
+<tr class="row-even"><td><a href="#id7"><span class="problematic" id="id8">`only`_</span></a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="command-line-parameters-descriptions">
+<h2>Command-Line Parameters Descriptions<a class="headerlink" href="#command-line-parameters-descriptions" title="Permalink to this headline">¶</a></h2>
+<p>There are several parameters that are either required or optional to make JOA run in Terminal or in Command Prompt.
+The order of parameters is not fixed. One may set the parameters in any order.
+You can see the preconditions of a parameter as shown in <a href="#id9"><span class="problematic" id="id10">`GLANET Command-Line Interface and Command-Line Arguments`_</span></a></p>
+<div class="section" id="f">
+<h3>-f<a class="headerlink" href="#f" title="Permalink to this headline">¶</a></h3>
+<p><strong>Required</strong> Absolute paths to input files must be specified just after <code class="xref std std-option docutils literal"><span class="pre">-f</span></code> option.</p>
+</div>
+<div class="section" id="t">
+<h3>-t<a class="headerlink" href="#t" title="Permalink to this headline">¶</a></h3>
+<p><strong>Optional</strong> This option specifies the data structure type used in finding the overlapping intervals. If you do not set anything, <code class="xref std std-option docutils literal"><span class="pre">-&quot;ST&quot;</span></code> segment tree is set as default.</p>
+</div>
+<div class="section" id="o">
+<h3>-o<a class="headerlink" href="#o" title="Permalink to this headline">¶</a></h3>
+<p><strong>Optional</strong> This option specifies the output type. If you do not set anything, <code class="xref std std-option docutils literal"><span class="pre">-&quot;only&quot;</span></code> is set as default.</p>
+</div>
+</div>
+<div class="section" id="joa-command-line-sample-runs">
+<h2>JOA Command-Line Sample Runs<a class="headerlink" href="#joa-command-line-sample-runs" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Example sample run that outputs to stdout:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ java -jar /path/to/joa.jar -f  /path/to/input1.bed  /path/to/input2.bed
+</pre></div>
+</div>
+<p>Example sample run that outputs to a file with redirection operator:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ java -jar /path/to/joa.jar -f  /path/to/input1.bed  /path/to/input2.bed /path/to/input3.bed /path/to/input4.bed /path/to/input5.bed  &gt; /path/to/joa_output_5files.txt
+</pre></div>
+</div>
+<p>Example sample run Using Indexed Segment Tree Forest:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ java -jar /path/to/joa.jar -f  /path/to/input1.bed  /path/to/input2.bed /path/to/input3.bed /path/to/input4.bed /path/to/input5.bed  -t &quot;istf&quot; &gt; /path/to/joa_output_5files.txt
+</pre></div>
+</div>
+<p>Example sample run for very large BED files:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ java Xms16G -Xmx16G -jar /path/to/joa.jar -f  /path/to/bigInput1.bed  /path/to/bigInput2.bed  -t &quot;istf&quot; &gt; /path/to/joa_output_big2files.txt
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="download.html" title="previous chapter">Download</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Burcak Otlu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/tutorial.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
