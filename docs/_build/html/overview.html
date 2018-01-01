@@ -44,34 +44,34 @@
 <h1>JOA Overview<a class="headerlink" href="#joa-overview" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="joa">
 <h2>JOA<a class="headerlink" href="#joa" title="Permalink to this headline">¶</a></h2>
-<p>JOA stands for joint overlap analysis of n interval sets.</p>
+<p>JOA stands for joint overlap analysis of <em>n</em> interval sets.</p>
 <p>Next-generation sequencing (NGS) technologies results in large volumes of genomic data.
 Genomic interval intersection is crucial for attaining biological insights from genomic datasets.</p>
-<p>JOA accepts n interval sets in Browser Extensible Data (BED) format and finds the overlapping intervals utilizing segment trees in a divide and conquer algorithm design in parallel.</p>
-<p>JOA also proposes a novel composite data structure “Indexed Segment Tree Forest” as an alternative data structure for segment tree.
-We show that while application is being run on, indexed segment tree forest reduces the search time.</p>
+<p>JOA accepts <em>n</em> interval sets in Browser Extensible Data (BED) format and finds the overlapping intervals using a divide and conquer algorithm design in parallel.</p>
+<p>JOA utilizes “Segment Tree” to find overlapping intervals.
+JOA also proposes a novel composite data structure “Indexed Segment Tree Forest” as an alternative to segment tree.
+We show that while the application is being run, indexed segment tree forest reduces the search time.</p>
 <p>JOA can be run using its GUI or on command line.</p>
 </div>
 <div class="section" id="joa-features">
 <h2>JOA Features<a class="headerlink" href="#joa-features" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>JOA has no constaints on the input such as sorted bed files or nonoverlapping intervals in a bed file.</li>
+<li>JOA has no constaints on the input such as sorted bed files or non-overlapping intervals in a bed file.</li>
 <li>JOA utilizes segment tree and indexed segment tree forest data structures for finding overlapping intervals.</li>
-<li>JOA provides two options for output. JOA can output only  the resulting overlapping interval for each found overlap. As a second option, JOA can provide the n overlapping intervals coming from n interval sets and plus the resulting overlapping interval for each interval.</li>
+<li>JOA provides two options for output. JOA can output only the resulting overlapping interval for each found overlap. As a second option, JOA can provide the <em>n</em> overlapping intervals coming from <em>n</em> interval sets and plus the resulting overlapping interval for each found overlap.</li>
 </ul>
 </div>
 <div class="section" id="joa-output">
 <h2>JOA Output<a class="headerlink" href="#joa-output" title="Permalink to this headline">¶</a></h2>
-<p>After a successful JOA execution</p>
 <ul class="simple">
-<li>JOA command line provides the overlappping intervals in stdout if no redirection to a file is provided.</li>
+<li>JOA command line outputs the overlappping intervals to stdout if no redirection to a file is provided.</li>
 </ul>
 <blockquote>
-<div><p>Example commad line run which outputs to stdout:</p>
+<div><p>Example command line run which outputs to stdout:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ java -jar &quot;path/to/joa.jar&quot; -f &quot;path/to/BEDFile1&quot; &quot;path/to/BEDFile2&quot; . . . &quot;path/to/BEDFileN&quot;
 </pre></div>
 </div>
-<p>Example commad line run which redirects output to a file:</p>
+<p>Example command line run which redirects output to a file:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ java -jar &quot;path/to/joa.jar&quot; -f &quot;path/to/BEDFile1&quot; &quot;path/to/BEDFile2&quot; . . . &quot;path/to/BEDFileN&quot;  &gt; outputFileName
 </pre></div>
 </div>

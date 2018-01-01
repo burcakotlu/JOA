@@ -6,7 +6,7 @@
 Welcome to JOA documentation!
 =============================
 
-JOA is Joint Overlap Analysis of N Interval Sets
+JOA is Joint Overlap Analysis of *N* Interval Sets
 
 Content:
 ^^^^^^^^
@@ -15,12 +15,10 @@ Content:
    :maxdepth: 2
 
    overview
-   instconfig
    download
    tutorial
-   datadrivencomputationalexperiments
    contact
-   licence
+..   licence
 
 .. Indices and tables
 .. ==================
