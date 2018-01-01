@@ -18,7 +18,6 @@ Content:
    download
    tutorial
    contact
-..   licence
 
 .. Indices and tables
 .. ==================
