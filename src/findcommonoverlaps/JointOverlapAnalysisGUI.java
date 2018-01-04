@@ -12,7 +12,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -47,11 +50,12 @@ public class JointOverlapAnalysisGUI extends JPanel{
 	private static final long serialVersionUID = 5537906678749479177L;
 	
 	private static JComboBox<String> dataStructureColumn;
+	private static JComboBox<String> outputTypeColumn;
 	
 	static int numberofIntervalSetFiles = 2;
 	
 	
-	static JTextArea logArea = new JTextArea(5,50);
+	static JTextArea logArea = new JTextArea(6,50);
 	
 	
 	
@@ -168,7 +172,7 @@ public class JointOverlapAnalysisGUI extends JPanel{
         /**************************************************/
         /**********GUI starts******************************/
         /**************************************************/
-		JFrame frame = new JFrame("Joint Overlap Analysis Framework");
+		JFrame frame = new JFrame("JOA");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);		
 		
 		//How graphics draws to mainPanel? How is it decided? Since mainPanel is the current instance that extends JPanel
@@ -194,15 +198,14 @@ public class JointOverlapAnalysisGUI extends JPanel{
 		intervalSetFilesPanel.setLayout(new GridBagLayout());
 		
 		
-		
 		/**************************************************/
-		/***********1st IntervalSetFile Panel starts ******/
+		/***********Load BED files Panel starts ***********/
 		/**************************************************/
-		JPanel intervalSetFilePanel = new JPanel();
-		intervalSetFilePanel.setLayout(new GridBagLayout());
+		JPanel loadBEDFilesPanel = new JPanel();
+		loadBEDFilesPanel.setLayout(new GridBagLayout());
 		
 		//JLabel Load Interval Set Files
-		JLabel loadIntervalSetFilesLabel = new JLabel("Load Interval Set Files");
+		JLabel loadIntervalSetFilesLabel = new JLabel("Load Input BED Files");
         
 		/*******************************************************************************/
 		/**********************ADD BUTTON starts****************************************/
@@ -224,22 +227,22 @@ public class JointOverlapAnalysisGUI extends JPanel{
 		
 		constraints.gridx = 0;
         constraints.gridy = 0;     
-        intervalSetFilePanel.add(loadIntervalSetFilesLabel, constraints);
+        loadBEDFilesPanel.add(loadIntervalSetFilesLabel, constraints);
         
       
         constraints.gridx = 1;
         constraints.gridy = 0; 
-        intervalSetFilePanel.add(addButton, constraints);
+        loadBEDFilesPanel.add(addButton, constraints);
 		/**************************************************/
-		/***********1st IntervalSetFile Panel ends ********/
+		/***********Load BED files Panel ends *************/
 		/**************************************************/
 		
 
 		/**************************************************/
-		/***********2nd IntervalSetFile Panel starts ******/
+		/***********Input BED File Panel starts ***********/
 		/**************************************************/
-        JPanel otherIntervalSetFilePanel = new JPanel();
-        otherIntervalSetFilePanel.setLayout(new GridBagLayout());
+        JPanel inputBEDFilePanel = new JPanel();
+        inputBEDFilePanel.setLayout(new GridBagLayout());
 		
 
 		JTextField inputFileTextField = new JTextField(30);
@@ -272,9 +275,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
 		/**********************BROWSE BUTTON ends***************************************/
 		/*******************************************************************************/
 
-
-		
-		
 		/*******************************************************************************/
 		/**********************REMOVE BUTTON starts*************************************/
 		/*******************************************************************************/
@@ -284,7 +284,7 @@ public class JointOverlapAnalysisGUI extends JPanel{
 			@Override
             public void actionPerformed(ActionEvent e) {
 				
-				intervalSetFilesPanel.remove(otherIntervalSetFilePanel);
+				intervalSetFilesPanel.remove(inputBEDFilePanel);
             	frame.pack();
 							
             }
@@ -296,28 +296,27 @@ public class JointOverlapAnalysisGUI extends JPanel{
 		
 		constraints.gridx = 0;
         constraints.gridy = 0;     
-        otherIntervalSetFilePanel.add(browseButton, constraints);
+        inputBEDFilePanel.add(browseButton, constraints);
         
         constraints.gridx = 1;
         constraints.gridy = 0; 
-        otherIntervalSetFilePanel.add(inputFileTextField, constraints);
+        inputBEDFilePanel.add(inputFileTextField, constraints);
         
         constraints.gridx = 2;
         constraints.gridy = 0; 
-        otherIntervalSetFilePanel.add(removeButton, constraints);
+        inputBEDFilePanel.add(removeButton, constraints);
 		/**************************************************/
-		/***********2nd IntervalSetFile Panel ends ********/
+		/***********Input BED File Panel ends *************/
 		/**************************************************/
 
-		
-	
+
         constraints.gridx = 0;
         constraints.gridy = 0; 
-        intervalSetFilesPanel.add(intervalSetFilePanel, constraints);
+        intervalSetFilesPanel.add(loadBEDFilesPanel, constraints);
       
         constraints.gridx = 0;
         constraints.gridy = 1;     
-        intervalSetFilesPanel.add(otherIntervalSetFilePanel,constraints);
+        intervalSetFilesPanel.add(inputBEDFilePanel,constraints);
         
 		// set border for the panel
         intervalSetFilesPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ""));
@@ -325,8 +324,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
         /**********Interval Set Files Panel ends***********/
         /**************************************************/
         
-        
- 		
 		
         /******************************************/
         /**********Parameter Panel starts**********/
@@ -335,43 +332,91 @@ public class JointOverlapAnalysisGUI extends JPanel{
 		parameterPanel.setLayout(new GridBagLayout());
 				
 				
-		JLabel dataStructureLabel = new JLabel("Data Structure");
-		
+		/*****************************************************/
+		JLabel dataStructureLabel = new JLabel("Data Structure");		
 		List<String> columns = new ArrayList<String>();
-		columns.add(Commons.INDEXED_SEGMENT_TREE_FOREST);
-		columns.add(Commons.SEGMENT_TREE);
-		
-	    String[] options = {"Indexed Segment Tree Forest", "Segment Tree"};
-		dataStructureColumn = new JComboBox<String>(options);
-
-		
+		columns.add(Commons.SEGMENT_TREE_GUI);
+		columns.add(Commons.INDEXED_SEGMENT_TREE_FOREST_GUI);
+		//columns.add(Commons.INDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE_GUI);		
+		dataStructureColumn = new JComboBox<String>();
 		//Populate data structure columns
-		dataStructureColumn.removeAllItems();
+		//dataStructureColumn.removeAllItems();
 		for(int i=0;i<columns.size();i++){
 			dataStructureColumn.addItem(columns.get(i));                		
 		}
-		
-		
-		JLabel presetLabel = new JLabel("Preset Value");
-		JTextField presetValue = new JTextField(8);
-		presetValue.setText("1000000");
+		/*****************************************************/
 
-		dataStructureColumn.addActionListener(new ActionListener() {
+		
+		/*****************************************************/
+		JLabel outputTypeLabel = new JLabel("Output Type");
+		List<String> outputTypeColumns = new ArrayList<String>();
+		outputTypeColumns.add(Commons.ONLY_RESULTING_INTERVAL_GUI);
+		outputTypeColumns.add(Commons.ALL_OVERLAPPING_INTERVALS_AND_RESULTING_INTERVAL_GUI);
+		outputTypeColumn = new JComboBox<String>();		
+		//Populate data structure columns
+		for(int i=0;i<outputTypeColumns.size();i++){
+			outputTypeColumn.addItem(outputTypeColumns.get(i));                		
+		}
+		/*****************************************************/
 
-            @Override
+
+		/*****************************************************/
+		JLabel outputFileLabel = new JLabel("Output File");
+		JTextField outputFileTextField = new JTextField(30);
+		
+		/*******************************************************************************/
+		/**********************OUTPUTFILE BROWSE BUTTON starts**************************/
+		/*******************************************************************************/
+		JButton outputBrowseButton = new JButton("Browse");
+		outputBrowseButton.addActionListener(new ActionListener() {
+            
+			@Override
             public void actionPerformed(ActionEvent e) {
             	
-            	//Get selected item
-            	if (dataStructureColumn.getSelectedItem().toString()==Commons.INDEXED_SEGMENT_TREE_FOREST) {
-            		presetValue.setEnabled(true);
-            	}else if (dataStructureColumn.getSelectedItem().toString()==Commons.SEGMENT_TREE) {
-            		presetValue.setEnabled(false);
-            	}
+            	JFileChooser fc = new JFileChooser();
+            	int returnVal;
+
+            	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
             	
+            	returnVal = fc.showOpenDialog(mainPanel);
+            	if( returnVal == JFileChooser.APPROVE_OPTION){
+            		
+            		File file = fc.getSelectedFile();
+            		outputFileTextField.setText(file.getPath() + System.getProperty( "file.separator"));
+            		
+             	}
+
             }
         });
+		/*******************************************************************************/
+		/**********************OUTPUTFILE BROWSE BUTTON ends****************************/
+		/*******************************************************************************/
+
+
+	
+		/*****************************************************/		
+//		JLabel presetLabel = new JLabel("Preset Value");
+//		JTextField presetValue = new JTextField(8);
+//		presetValue.setText("1000000");
+
+//		dataStructureColumn.addActionListener(new ActionListener() {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//            	
+//            	//Get selected item
+//            	if (dataStructureColumn.getSelectedItem().toString()==Commons.INDEXED_SEGMENT_TREE_FOREST) {
+//            		presetValue.setEnabled(true);
+//            	}else if (dataStructureColumn.getSelectedItem().toString()==Commons.SEGMENT_TREE) {
+//            		presetValue.setEnabled(false);
+//            	}
+//            	
+//            }
+//        });
+		/*****************************************************/		
 		
 			
+	    /***************************************************/
 	    //Data Structure Label
 	    constraints.gridx = 0;
 	    constraints.gridy = 0; 
@@ -383,20 +428,45 @@ public class JointOverlapAnalysisGUI extends JPanel{
 	    constraints.gridy = 0; 
 	    constraints.gridwidth =1;
 	    parameterPanel.add(dataStructureColumn,constraints);
+	    /***************************************************/
 
-	   
-		//Preset Label
-		constraints.gridx = 2;
-	    constraints.gridy = 0; 
+	   	    
+	    
+	    /***************************************************/
+	    //outputType  Label
+	    constraints.gridx = 0;
+	    constraints.gridy = 1; 
 	    constraints.gridwidth =1;
-	    parameterPanel.add(presetLabel,constraints);
-		
-		//Preset Value
-		constraints.gridx = 3;
-	    constraints.gridy = 0; 
+	    parameterPanel.add(outputTypeLabel,constraints);
+	    
+	    //outputType  Column
+	    constraints.gridx = 1;
+	    constraints.gridy = 1; 
 	    constraints.gridwidth =1;
-	    parameterPanel.add(presetValue,constraints);
+	    parameterPanel.add(outputTypeColumn,constraints);
+	    /***************************************************/
 
+	    
+	    /***************************************************/
+	    //outputFileLabel
+	    constraints.gridx = 0;
+	    constraints.gridy = 2; 
+	    constraints.gridwidth =1;
+	    parameterPanel.add(outputFileLabel,constraints);
+	    
+	    //outputFileTextField
+	    constraints.gridx = 1;
+	    constraints.gridy = 2; 
+	    constraints.gridwidth =1;
+	    parameterPanel.add(outputFileTextField,constraints);
+	    
+//	    constraints.gridx = 2;
+//	    constraints.gridy = 2; 
+//	    constraints.gridwidth =1;
+//	    parameterPanel.add(outputBrowseButton,constraints);
+	    /***************************************************/
+	    
+	    
 		
 		// set border for the panel
 	    parameterPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Parameters"));
@@ -431,9 +501,15 @@ public class JointOverlapAnalysisGUI extends JPanel{
             	/*******************************************************/
             	/*******************************************************/
                
-            	int preset = Integer.parseInt(presetValue.getText());
+                //Set default preset
+            	int preset = 1000000;
+            	
+                //Set default numberofPercent
+                int numberofPercent = 1;
+ 
             	
             	List<String> intervalSetFiles =  new ArrayList<String>();
+            	String outputFile = outputFileTextField.getText();
             	
             	Component[] components = intervalSetFilesPanel.getComponents();
                 for (Component comp : components) {
@@ -446,7 +522,7 @@ public class JointOverlapAnalysisGUI extends JPanel{
                 			 if (innerComp instanceof JTextField) {
                                  JTextField textField = (JTextField) innerComp;
                                  intervalSetFiles.add(textField.getText());
-                                 System.out.println(textField.getText());
+                                 //System.out.println(textField.getText());
                              }
                 		}//End of JTextField
                             
@@ -457,46 +533,115 @@ public class JointOverlapAnalysisGUI extends JPanel{
                 String[] intervalSetFilesArray = new String[intervalSetFiles.size()];
                 intervalSetFiles.toArray(intervalSetFilesArray);
                
-                //ParallelOneSegmentTreeForEachIntervalSet.findCommonOverlapsInParallel(null, preset,1, intervalSetFiles.size(), intervalSetFilesArray, "/home/burcak/Developer/Java/JOA/test.txt");            	                             
 
                 //Check whether interval set files are entered
-                boolean valid = checkIntervalSetFileNamesStringArray(intervalSetFilesArray);
+                boolean valid = checkIntervalSetFileNamesStringArrayforGUI(intervalSetFilesArray);
                
-                //Internally set
-                int numberofPercent = 1;
-                
+                  
                 try {
+                	
+                	DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                	
                 	
                 	if (valid) {
                 		
-                		if (dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.INDEXED_SEGMENT_TREE_FOREST)) {
+                		logArea.setText(null);
+            			//appendNewTextToLogArea("********************************");
+            			appendNewTextToLogArea("Joint Overlap Analysis started: " + sdf.format(new Date()));            			
+            			appendNewTextToLogArea("Data structure used: " + dataStructureColumn.getSelectedItem().toString() + ".");
+            			appendNewTextToLogArea("Output type: " + outputTypeColumn.getSelectedItem().toString() + ".");
+            			
 
-        					JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
-        							preset,
-        							IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
-        							1,
-        							intervalSetFiles.size(),
-        							intervalSetFilesArray,
-        							numberofPercent,
-        							SearchMethod.NOT_SET,
-        							OutputType.ONLY_RESULTING_INTERVAL);
+                		//OutputType Only
+                		if (outputTypeColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.ONLY_RESULTING_INTERVAL_GUI)) {
+                			
+                			
+                			//ST
+                			if(dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.SEGMENT_TREE_GUI)) {
+                				
+                				JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_ResultingIntervalOnly_GUI(
+                						intervalSetFilesArray,
+    									outputFile);
+                			}
+                			//ISTF
+                			else if(dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.INDEXED_SEGMENT_TREE_FOREST_GUI)) {
+                				
+    							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly_GUI(
+    									preset,
+    									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+    									intervalSetFilesArray,
+    									numberofPercent,
+    									SearchMethod.NOT_SET,
+    									outputFile);
 
-                        } else if (dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.SEGMENT_TREE)) {
-                        	
-                        	JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree(
-                					1,
-                					intervalSetFiles.size(),
-        							intervalSetFilesArray,
-                					OutputType.ONLY_RESULTING_INTERVAL);
-
-                        }
+                			}
+                			//ISTF using last overlapping linked node
+                			else {
+                				
+                				JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly_GUI(
+    									preset,
+    									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+    									intervalSetFilesArray,
+    									numberofPercent,
+    									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED,
+    									outputFile);
+    							
+                			}
+                			
+                		}//End of outputType Only
                 		
-                	}
+                		//OutputType All
+                		else{
+                			
+                			//TreeType
+                			//ST
+                			if(dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.SEGMENT_TREE_GUI)) {
+    							
+                				JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_GUI(
+    									intervalSetFilesArray,
+    									outputFile);
+
+                			}
+                			//ISTF
+                			else if(dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.INDEXED_SEGMENT_TREE_FOREST_GUI)) {
+                				
+    							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_GUI(
+    									preset,
+    									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+    									intervalSetFilesArray,
+    									numberofPercent,
+    									SearchMethod.NOT_SET,
+    									outputFile);
+
+                			}
+                			//ISTF using last overlapping linked node
+                			else {
+                				
+    							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_GUI(
+    									preset,
+    									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+    									intervalSetFilesArray,
+    									numberofPercent,
+    									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED,
+    									outputFile);
+
+                				
+                			}
+
+                			
+                		}//End of outputType All
+                		
+
+            			appendNewTextToLogArea("Output is written to " + outputFile + ".");
+            			appendNewTextToLogArea("Joint Overlap Analysis ended: " + sdf.format(new Date()));
+            			//appendNewTextToLogArea("********************************");
+
+                		
+                	}//End of valid input files
                 	
                 						
 					
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
             	
@@ -585,7 +730,7 @@ public class JointOverlapAnalysisGUI extends JPanel{
 			
 		
 		// set border for the panel
-		mainPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Joint Overlap Analysis"));
+		mainPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Joint Overlap Analysis of N Interval Set"));
 	    /******************************************/
         /******Add Panels to Main Panel ends********/
         /******************************************/
@@ -729,10 +874,7 @@ public class JointOverlapAnalysisGUI extends JPanel{
     
     @Parameter(names={"--percentage", "-pe"})
     int percentage=1;
-    
-    @Parameter(names={"--numofRepeats", "-r"})
-    int numberofRepetitions=1;
-    
+       
 	@Parameter(names = {"--files","-f"}, variableArity = true)
 	public List<String> filenames = new ArrayList<>();
 
@@ -740,7 +882,10 @@ public class JointOverlapAnalysisGUI extends JPanel{
     String outputType = Commons.ONLY_RESULTING_INTERVAL;
 	
     @Parameter(names={"--tree", "-t"})
-    String treeType = Commons.INDEXED_SEGMENT_TREE_FOREST;
+    String treeType = Commons.SEGMENT_TREE;
+    
+    @Parameter(names={"--outputFile", "-of"})
+    String outputFile = Commons.NO_OUTPUTFILE_IS_SET;
 	/*****************************************/
 	/****Command  Line Parameter ends*********/
 	/*****************************************/
@@ -754,64 +899,111 @@ public class JointOverlapAnalysisGUI extends JPanel{
         JCommander.newBuilder().addObject(joa).build().parse(args);
         
         String[] filesArray = joa.filenames.toArray(new String[joa.filenames.size()]);
-        
-        if (joa.preset>0 && checkIntervalSetFileNamesStringArray(filesArray)) {
-        	
-        	System.out.println(joa.preset);
-        	System.out.println(joa.percentage);
-        	System.out.println(joa.numberofRepetitions);
-        	
-        	System.out.println(joa.filenames);
-        	System.out.println(joa.treeType);
-        	System.out.println(joa.outputType);
+
+        //joa.jar is provided with input BED Files, so run it with command line parameters
+        if (checkIntervalSetFileNamesStringArray(filesArray)) {
         	        	
         	DataStructureType treeType = DataStructureType.convertStringtoEnum(joa.treeType);
         	OutputType outputType = OutputType.convertStringtoEnum(joa.outputType);
         	
 			try {
 				
-				if (treeType.isINDEXED_SEGMENT_TREE_FOREST()) {
+				//Fastest one. Only resulting interval.	
+				if (outputType.isONLY_RESULTING_INTERVAL()) {
 					
+					switch(treeType) {
 					
-					JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
-							joa.preset,
-							IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
-							joa.numberofRepetitions,
-							joa.filenames.size(),
-							filesArray,
-							joa.percentage,
-							SearchMethod.NOT_SET,
-							outputType);
+						case INDEXED_SEGMENT_TREE_FOREST:
+							
+							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly(
+									joa.preset,
+									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+									joa.filenames.size(),
+									filesArray,
+									joa.percentage,
+									SearchMethod.NOT_SET);
+							break;
+						
+						case INDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE:
+							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly(
+									joa.preset,
+									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+									joa.filenames.size(),
+									filesArray,
+									joa.percentage,
+									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED);
+							break;
+							
+						case SEGMENT_TREE:
+							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_ResultingIntervalOnly(
+			    					joa.filenames.size(),
+			    					filesArray);
+							break;
+						
+						default:
+							break;
+						
+							
+					}//End of switch
 					
-				} else if (treeType.isINDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE()) {
+				}else {
 					
-					JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
-							joa.preset,
-							IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
-							joa.numberofRepetitions,
-							joa.filenames.size(),
-							filesArray,
-							joa.percentage,
-							SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED,
-							outputType);
-
+					switch(treeType) {
 					
-				}else if (treeType.isSEGMENT_TREE()) {
-					
-					JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree(
-        					joa.numberofRepetitions,
-        					joa.filenames.size(),
-        					filesArray,
-        					outputType);
+						case INDEXED_SEGMENT_TREE_FOREST:
+							
+							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
+									joa.preset,
+									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+									joa.filenames.size(),
+									filesArray,
+									joa.percentage,
+									SearchMethod.NOT_SET);
+							break;
+						
+						case INDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE:
+							
+							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
+									joa.preset,
+									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+									joa.filenames.size(),
+									filesArray,
+									joa.percentage,
+									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED);
+	
+							break;
+							
+						case SEGMENT_TREE:
+							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree(
+		        					joa.filenames.size(),
+		        					filesArray);
+							break;
+						
+						default:
+							break;
+						
+							
+					}//End of switch
 
 					
 				}
-				
+								
 				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-        }else {
+			
+			
+        }
+        
+        //Open JOA GUI and run through GUI
+        else {
+        	
+        	//Get treeType from GUI
+        	//Get outputFile from  GUI
+        	//Get outputType from  GUI        	
+        	//Use default presetValue
+        	//Use default percentahe
     		prepareGUI();
         	
         }
@@ -821,27 +1013,61 @@ public class JointOverlapAnalysisGUI extends JPanel{
 	public static boolean checkIntervalSetFileNamesStringArray(String[] intervalSetFilesArray) {
 		
 		if (intervalSetFilesArray == null ) {
-			appendNewTextToLogArea("Interval Set File is null");
+			//appendNewTextToLogArea("Interval Set File is null.");
 	        return false;
 	    }
 		
 		if (intervalSetFilesArray.length == 0 ) {
-	        appendNewTextToLogArea("Interval Set Files is empty, meaning it has no element");
+	        //appendNewTextToLogArea("Interval Set Files is empty.");
 	        return false; 
 	    }
 		
 	    for ( String s : intervalSetFilesArray ) {
 	        if (s == null) {
-		        appendNewTextToLogArea("Interval Set Files contain null element");
+		        //appendNewTextToLogArea("Interval Set Files contain null element.");
 	            return false;
 	        }
 	        if (s.length() == 0) {
-		        appendNewTextToLogArea("Interval Set Files contain empty string");
+		        //appendNewTextToLogArea("Interval Set Files contain empty string.");
 	            return false; 
 	        }
 	        // or
 	        if (s.isEmpty()) {
-		        appendNewTextToLogArea("Interval Set Files contain empty string");
+		        //appendNewTextToLogArea("Interval Set Files contain empty string.");
+	            return false;
+	        }
+	    }
+
+	    return true;
+		
+		
+	}
+	
+	
+	public static boolean checkIntervalSetFileNamesStringArrayforGUI(String[] intervalSetFilesArray) {
+		
+		if (intervalSetFilesArray == null ) {
+			appendNewTextToLogArea("Interval Set File is null.");
+	        return false;
+	    }
+		
+		if (intervalSetFilesArray.length == 0 ) {
+	        appendNewTextToLogArea("Interval Set Files is empty.");
+	        return false; 
+	    }
+		
+	    for ( String s : intervalSetFilesArray ) {
+	        if (s == null) {
+		        appendNewTextToLogArea("Interval Set Files contain null element.");
+	            return false;
+	        }
+	        if (s.length() == 0) {
+		        appendNewTextToLogArea("Interval Set Files contain empty string.");
+	            return false; 
+	        }
+	        // or
+	        if (s.isEmpty()) {
+		        appendNewTextToLogArea("Interval Set Files contain empty string.");
 	            return false;
 	        }
 	    }

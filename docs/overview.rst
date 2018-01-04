@@ -15,7 +15,7 @@ JOA accepts *n* interval sets in Browser Extensible Data (BED) format and finds 
 
 JOA utilizes "Segment Tree" to find overlapping intervals.
 JOA also proposes a novel composite data structure "Indexed Segment Tree Forest" as an alternative to segment tree. 
-We show that while the application is being run, indexed segment tree forest reduces the search time.
+We show that while the application is being run, indexed segment tree forest reduces the query time on average.
 
 JOA can be run using its GUI or on command line.
                                                                                                                                    
@@ -41,7 +41,7 @@ JOA Output
 
 	$ java -jar "path/to/joa.jar" -f "path/to/BEDFile1" "path/to/BEDFile2" . . . "path/to/BEDFileN"  > outputFileName
 
-* JOA GUI provides the overlappping intervals in the outputFileName provided by the user. 
-			   | ~path/to/providedFolder/outputFileName
+* JOA GUI provides the overlappping intervals in the output file provided by the user. 
+			   
 
 

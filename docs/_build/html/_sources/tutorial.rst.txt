@@ -124,3 +124,14 @@ JOA Command-Line Sample Runs
 
 	$ java Xms16G -Xmx16G -jar /path/to/joa.jar -f  /path/to/bigInput1.bed  /path/to/bigInput2.bed > /path/to/joa_output_big2files.txt
 
+-------
+JOA GUI
+-------
+
+* JOA GUI can be run by double clicking on it.
+
+* JOA GUI can be run by command line when no JOA command-line parameters are provided.
+
+	$ java -jar "path/to/joa.jar"
+
+

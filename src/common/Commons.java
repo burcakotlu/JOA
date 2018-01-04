@@ -85,10 +85,24 @@ public class Commons {
 	public final static String INDEXED_SEGMENT_TREE_FOREST = "istf"; //"Indexed Segment Tree Forest";
 	public final static String INDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE = "istf_star"; //"Indexed Segment Tree Forest Star";
 	public final static String SEGMENT_TREE = "st"; //"Segment Tree";
+
+	
+	//Tree Type FOR GUI
+	public final static String INDEXED_SEGMENT_TREE_FOREST_GUI = "INDEXED SEGMENT TREE FOREST"; //"Indexed Segment Tree Forest";
+	public final static String INDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE_GUI = "INDEXED SEGMENT TREE FOREST USING LAST OVERLAPPING NODE"; //"Indexed Segment Tree Forest Star";
+	public final static String SEGMENT_TREE_GUI = "SEGMENT TREE"; //"Segment Tree";
+
+	
+	//OutputFile
+	public final static String NO_OUTPUTFILE_IS_SET = "NO_OUTPUTFILE_IS_SET";
 	
 	//Output Type
 	public final static String ONLY_RESULTING_INTERVAL = "one"; 
 	public final static String ALL_OVERLAPPING_INTERVALS_AND_RESULTING_INTERVAL = "all"; 
 
+
+	//Output Type for GUI
+	public final static String ONLY_RESULTING_INTERVAL_GUI = "ONLY RESULTING INTERVAL"; 
+	public final static String ALL_OVERLAPPING_INTERVALS_AND_RESULTING_INTERVAL_GUI = "ALL OVERLAPPING INTERVALS AND RESULTING INTERVAL"; 
 
 }

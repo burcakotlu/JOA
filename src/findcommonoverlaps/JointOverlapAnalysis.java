@@ -251,11 +251,10 @@ public class JointOverlapAnalysis {
 	//DEC 15, 2017 ends
 	
 	//DEC 12, 2017 
-	//Std Output
-	public static void writeToStdOut(
+	//Stdout Output All
+	public static void writeToStdOutAll(
 			TIntObjectMap<List<List<Interval>>> chrNumber2OverlappingIntervalsListListMap, 
-			int numberofIntervalSets,
-			OutputType outputType){
+			int numberofIntervalSets){
 		
 		List<List<Interval>> overlappingIntervalListList = null;
 		List<Interval> overlappingIntervalList = null;
@@ -265,212 +264,292 @@ public class JointOverlapAnalysis {
 		//BufferedWriter performed better than BufferedOutputStream
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));	       		
 	        
-	try {
-		
-		//Write in an order
-		//chr1 --> 1, chr2 --> 2, ..., chrX --> 23, chrY --> 24, chrM --> 25
-		for(int chrNum=1; chrNum<=25;chrNum++) {
+		try {
 			
-			overlappingIntervalListList =chrNumber2OverlappingIntervalsListListMap.get(chrNum);
-			
-			for(int i=0; i<overlappingIntervalListList.size(); i++){
+			//Write in an order
+			//chr1 --> 1, chr2 --> 2, ..., chrX --> 23, chrY --> 24, chrM --> 25
+			for(int chrNum=1; chrNum<=25;chrNum++) {
 				
-				overlappingIntervalList = overlappingIntervalListList.get(i);
+				overlappingIntervalListList =chrNumber2OverlappingIntervalsListListMap.get(chrNum);
 				
-				
-				//All overlapping intervals and resulting interval
-				out.write(ChromosomeName.convertInttoString(chrNum) + "\t");
-				
-				for(j=0; j<overlappingIntervalList.size(); j++){
-
-					//Order is important
-					//First info
-					if (overlappingIntervalList.get(j).getInfo()!=null)
-						out.write(overlappingIntervalList.get(j).getInfo() + "\t");
-
-					//To write in bed format endPoint plus 1
-					out.write(overlappingIntervalList.get(j).getLowerEndPoint() + "\t" +  (overlappingIntervalList.get(j).getHigherEndPoint()+1) + "\t");
+				for(int i=0; i<overlappingIntervalListList.size(); i++){
 					
-				}//End of for each Interval in intervalList
+					overlappingIntervalList = overlappingIntervalListList.get(i);
+					
+					
+					//All overlapping intervals and resulting interval
+					out.write(ChromosomeName.convertInttoString(chrNum) + "\t");
+					
+					for(j=0; j<overlappingIntervalList.size(); j++){
+	
+						//Order is important
+						//First info
+						if (overlappingIntervalList.get(j).getInfo()!=null)
+							out.write(overlappingIntervalList.get(j).getInfo() + "\t");
+	
+						//To write in bed format endPoint plus 1
+						out.write(overlappingIntervalList.get(j).getLowerEndPoint() + "\t" +  (overlappingIntervalList.get(j).getHigherEndPoint()+1) + "\t");
+						
+					}//End of for each Interval in intervalList
+				
+					out.write(System.getProperty("line.separator"));
+					
+											
+				}//End of for each intervalList in intervalListList
+	
+			}//End of for each chromosome
 			
-				out.write(System.getProperty("line.separator"));
-				
-										
-			}//End of for each intervalList in intervalListList
-
-		}//End of for each chromosome
-		
-
-//		for(TIntObjectIterator<List<List<Interval>>>  itr = chrNumber2OverlappingIntervalsListListMap.iterator();itr.hasNext();){
-//			
-//			itr.advance();
-//			
-//			chrNumber = itr.key();
-//			overlappingIntervalListList = itr.value();
-//			
-//			for(int i=0; i<overlappingIntervalListList.size(); i++){
-//				
-//				overlappingIntervalList = overlappingIntervalListList.get(i);
-//				
-//				
-//				//All overlapping intervals and resulting interval
-//				out.write(ChromosomeName.convertInttoString(chrNumber) + "\t");
-//				
-//				for(j=0; j<overlappingIntervalList.size(); j++){
-//
-//					//Order is important
-//					//First info
-//					if (overlappingIntervalList.get(j).getInfo()!=null)
-//						out.write(overlappingIntervalList.get(j).getInfo() + "\t");
-//
-//					//To write in bed format endPoint plus 1
-//					out.write(overlappingIntervalList.get(j).getLowerEndPoint() + "\t" +  (overlappingIntervalList.get(j).getHigherEndPoint()+1) + "\t");
-//					
-//				}//End of for each Interval in intervalList
-//			
-//				out.write(System.getProperty("line.separator"));
-//				
-//										
-//			}//End of for each intervalList in intervalListList
-//			
-//		}//End of for each chromosome
-		
-		//Close the Writer
-		out.close();
-		
-		
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
+			
+			//Close the Writer
+			out.close();
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 				
 
 	}
 	
 
-	
-	//For Debugging 
+	/**************************************************************************************************/
+	/*************************** For JOA GUI STARTS ***************************************************/
+	/**************************************************************************************************/	
 	public static void writeToAFile(
-			TIntObjectMap<List<List<Interval>>> chrNumber2OverlappingIntervalsListListMap, 
-			int numberofIntervalSets, 
-			String informativeFileName){
+			TIntObjectMap<List<Interval>> chrNumber2ResultingIntervalListMap, 
+			String outputFile){
 		
-		int chrNumber;
-		List<List<Interval>> overlappingIntervalListList = null;
 		List<Interval> overlappingIntervalList = null;
-		
-		FileWriter searchResultsFileWriter =null;
-		BufferedWriter searchResultsBufferedWriter = null;
 		
 		try {
 			
-			//For debug
-			//searchResultsFileWriter = FileOperations.createFileWriter(informativeFileName + "_searchResults.txt");
+			FileWriter fileWriter = new FileWriter(outputFile);
+			BufferedWriter out = new BufferedWriter(fileWriter);
 			
-			//For JOA GUI
-			searchResultsFileWriter = FileOperations.createFileWriter(informativeFileName);
-			//For JOA GUI
-			
-			searchResultsBufferedWriter = new BufferedWriter(searchResultsFileWriter);		
-			
-			//Write header line
-			searchResultsBufferedWriter.write("chrNumber"+ "\t");
-			
-			//Write header line			
-			for(int i=0; i<numberofIntervalSets;i++){
-				searchResultsBufferedWriter.write("LowEndPoint\tHighEndPoint\t");
-			}
-			
-			//Write header line
-			searchResultsBufferedWriter.write("CommonLowEndPoint\tCommonHighEndPoint" + System.getProperty("line.separator"));			
-			
-			for(TIntObjectIterator<List<List<Interval>>>  itr = chrNumber2OverlappingIntervalsListListMap.iterator();itr.hasNext();){
+			//Write in an order
+			//chr1 --> 1, chr2 --> 2, ..., chrX --> 23, chrY --> 24, chrM --> 25
+			for(int i=1; i<=25;i++) {
 				
-				itr.advance();
+				overlappingIntervalList=chrNumber2ResultingIntervalListMap.get(i);
 				
-				chrNumber = itr.key();
-				overlappingIntervalListList = itr.value();
+				if (overlappingIntervalList!=null) {
+					
+					for(int j=0; j<overlappingIntervalList.size(); j++){
+						//To write in bed format plus 1
+						out.write(ChromosomeName.convertInttoString(i) + "\t" + overlappingIntervalList.get(j).getLowerEndPoint() + "\t" +  (overlappingIntervalList.get(j).getHigherEndPoint()+1) + System.getProperty("line.separator"));											
+					}//End of for each interval in intervalList
+					
+					
+				}//End of IF
 				
-				for(int i=0; i<overlappingIntervalListList.size(); i++){
-					overlappingIntervalList = overlappingIntervalListList.get(i);
-					
-					searchResultsBufferedWriter.write(ChromosomeName.convertInttoString(chrNumber) + "\t");
-						
-					//One way of output
-					//All overlapping intervals and resulting interval
-//					for(int j=0; j<overlappingIntervalList.size(); j++){
-//
-//						//Order is important
-//						//First info
-//						if (overlappingIntervalList.get(j).getInfo()!=null)
-//							searchResultsBufferedWriter.write(overlappingIntervalList.get(j).getInfo() + "\t");
-//
-//						searchResultsBufferedWriter.write(overlappingIntervalList.get(j).getLowerEndPoint() + "\t" +  overlappingIntervalList.get(j).getHigherEndPoint() + "\t");
-//						
-//		
-//					}//End of for each Interval in intervalList
-					
-					
-					//Another way of output
-					//Just Output the resulting interval 
-					int j = overlappingIntervalList.size()-1;
-					searchResultsBufferedWriter.write(overlappingIntervalList.get(j).getLowerEndPoint() + "\t" +  overlappingIntervalList.get(j).getHigherEndPoint() + "\t");
-
-					searchResultsBufferedWriter.write(System.getProperty("line.separator"));
-					
-					
-				}//End of for each intervalList in intervalListList
-				
-			}//End of for each chromosome
+			}//End of for
+	
 			
-			//Close
-			searchResultsBufferedWriter.close();
-		
+			//close
+			out.close();
+			
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+
+	}
+
+	
+	
+	
+	public static void writeToAFileAll(
+			TIntObjectMap<List<List<Interval>>> chrNumber2OverlappingIntervalsListListMap, 
+			int numberofIntervalSets, 
+			String outputFile){
+		
+		List<List<Interval>> overlappingIntervalListList = null;
+		List<Interval> overlappingIntervalList = null;
+		
+		int j;
+		
+		     
+		try {
+			
+			FileWriter fileWriter = new FileWriter(outputFile);
+			BufferedWriter out = new BufferedWriter(fileWriter);
+
+			
+			//Write in an order
+			//chr1 --> 1, chr2 --> 2, ..., chrX --> 23, chrY --> 24, chrM --> 25
+			for(int chrNum=1; chrNum<=25;chrNum++) {
+				
+				overlappingIntervalListList =chrNumber2OverlappingIntervalsListListMap.get(chrNum);
+				
+				for(int i=0; i<overlappingIntervalListList.size(); i++){
+					
+					overlappingIntervalList = overlappingIntervalListList.get(i);
+					
+					
+					//All overlapping intervals and resulting interval
+					out.write(ChromosomeName.convertInttoString(chrNum) + "\t");
+					
+					for(j=0; j<overlappingIntervalList.size(); j++){
+	
+						//Order is important
+						//First info
+						if (overlappingIntervalList.get(j).getInfo()!=null)
+							out.write(overlappingIntervalList.get(j).getInfo() + "\t");
+	
+						//To write in bed format endPoint plus 1
+						out.write(overlappingIntervalList.get(j).getLowerEndPoint() + "\t" +  (overlappingIntervalList.get(j).getHigherEndPoint()+1) + "\t");
+						
+					}//End of for each Interval in intervalList
+				
+					out.write(System.getProperty("line.separator"));
+					
+											
+				}//End of for each intervalList in intervalListList
+	
+			}//End of for each chromosome
+			
+			
+			//Close the Writer
+			out.close();
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	
 		
 
 	}
+	/**************************************************************************************************/
+	/*************************** For JOA GUI ENDS *****************************************************/
+	/**************************************************************************************************/
+	
+	
+	/*****************************************************************************/
+	/******************** FOR JOA GUI STARTS *************************************/
+	/*****************************************************************************/
+	public static void constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_ResultingIntervalOnly_GUI(
+			String[] intervalSetsFileNames,
+			String outputFile) throws IOException {
+		
+		TIntObjectMap<List<Interval>> chrNumber2ResultingIntervalListMap = null;
+				
+		SegmentTree.createForkJoinPool();		
+		chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
+				intervalSetsFileNames.length,
+				intervalSetsFileNames);						
+		SegmentTree.shutdownForkJoinPool();		
+		
+		writeToAFile(chrNumber2ResultingIntervalListMap, outputFile);
+		chrNumber2ResultingIntervalListMap= null;
+	
+				
+	}	
+	
+	public static void constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly_GUI(
+			int presetValue,
+			IndexingLevelDecisionMode mode,
+			String[] intervalSetsFileNames,
+			int numberofPercent,
+			SearchMethod searchMethod,
+			String outputFile) throws IOException {
+				
+		TIntObjectMap<List<Interval>> chrNumber2ResultingIntervalListMap = null;
+		
+		SegmentTree.createForkJoinPool();		
+		chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
+				presetValue,
+				mode,
+				intervalSetsFileNames.length,
+				intervalSetsFileNames,
+				numberofPercent,
+				searchMethod);
+		SegmentTree.shutdownForkJoinPool();
+
+		writeToAFile(chrNumber2ResultingIntervalListMap, outputFile);
+		chrNumber2ResultingIntervalListMap= null;
+						
+		
+	}	
+	
+	public static void constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_GUI(
+			String[] intervalSetsFileNames,
+			String outputFile) throws IOException {
+		
+		TIntObjectMap<List<List<Interval>>> chrNumber2OverlappingIntervalsListListMap = null;
+		
+				
+		/*********************************************************************************************/
+		/****************** Segment Tree starts*******************************************************/
+		/*********************************************************************************************/			
+		SegmentTree.createForkJoinPool();
+		chrNumber2OverlappingIntervalsListListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased(
+				intervalSetsFileNames.length,
+				intervalSetsFileNames);		
+		SegmentTree.shutdownForkJoinPool();
+
+		writeToAFileAll(chrNumber2OverlappingIntervalsListListMap, intervalSetsFileNames.length, outputFile);
+		chrNumber2OverlappingIntervalsListListMap=null;
+		/***********************************************************************************************************/
+		/******************Segment Tree ends*********************************************************/
+		/***********************************************************************************************************/
+		
+	}
+	
+	public static void constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_GUI(
+			int presetValue,
+			IndexingLevelDecisionMode mode,
+			String[] intervalSetsFileNames,
+			int numberofPercent,
+			SearchMethod searchMethod,
+			String outputFile) throws IOException {	
+		
+		TIntObjectMap<List<List<Interval>>> chrNumber2OverlappingIntervalsListListMap = null;
+					
+		/***********************************************************************************************************/
+		/******************Indexed Segment Tree Forest starts*******************************************************/
+		/***********************************************************************************************************/			
+		SegmentTree.createForkJoinPool();
+		chrNumber2OverlappingIntervalsListListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased(
+				presetValue,
+				mode,
+				intervalSetsFileNames.length,
+				intervalSetsFileNames,
+				numberofPercent,
+				searchMethod);
+		SegmentTree.shutdownForkJoinPool();
+
+		writeToAFileAll(chrNumber2OverlappingIntervalsListListMap, intervalSetsFileNames.length, outputFile);
+		chrNumber2OverlappingIntervalsListListMap = null;
+		/***********************************************************************************************************/
+		/******************Indexed Segment Tree Forest ends*********************************************************/
+		/***********************************************************************************************************/
+				
+	}	
+
+	/*****************************************************************************/
+	/******************** FOR JOA GUI ENDS ***************************************/
+	/*****************************************************************************/
+	
 	
 	//DEC 15, 2017 starts
 	public static void constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_ResultingIntervalOnly(
-			int numberofRepetations,
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames) throws IOException {
 		
 		//Overlapping Intervals found by Indexed Segment Tree Forest
 		TIntObjectMap<List<Interval>> chrNumber2ResultingIntervalListMap = null;
 				
-		//long startTime1, startTime2, readConstructSearchTime, writeOutputTime, totalTime;
-			
-		SegmentTree.createForkJoinPool();
-		
-//		for(int i=0; i < numberofRepetations; i++){
-			
-			//startTime1 = System.nanoTime();		
-			//Keeps list of overlapping intervals and their common overlap
-			chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
-					numberofIntervalSetInputFiles,
-					intervalSetsFileNames);				
-			//readConstructSearchTime = System.nanoTime()-startTime1;
-					
-			
-			//startTime2 = System.nanoTime();		
-			//write to std out
-			writeToStdOut(chrNumber2ResultingIntervalListMap);		
-			//writeOutputTime = System.nanoTime()-startTime2;
-			
-			//totalTime = System.nanoTime()-startTime1;
-			//bufferedWriter.write("SegmentTree" + "\t" +(i+1) + "\t" + readConstructSearchTime/Commons.ONE_MILLION_FLOAT + "\t" + writeOutputTime/Commons.ONE_MILLION_FLOAT + "\t" + totalTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));			
-			chrNumber2ResultingIntervalListMap= null;
-		
-//		}//End of for each repetition
-		
-		//bufferedWriter.write("##########################################################################" + System.getProperty("line.separator"));
-			
+		SegmentTree.createForkJoinPool();		
+		chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
+				numberofIntervalSetInputFiles,
+				intervalSetsFileNames);				
 		SegmentTree.shutdownForkJoinPool();		
-				
+
+		writeToStdOut(chrNumber2ResultingIntervalListMap);		
+		chrNumber2ResultingIntervalListMap= null;
+						
 	}
 	//DEC 15, 2017 ends
 
@@ -478,81 +557,23 @@ public class JointOverlapAnalysis {
 	
 	//October 18, 2017 starts
 	//Called for Segment Tree
+	//Output all overlapping intervals and resulting interval
 	public static void constructParallel_searchParallel_FileBased_ChromBased_SegmentTree(
-			int numberofRepetations,
 			int numberofIntervalSetInputFiles,
-			String[] intervalSetsFileNames,
-			OutputType outputType) throws IOException {
+			String[] intervalSetsFileNames) throws IOException {
 		
 		//Overlapping Intervals found by Segment Tree
 		TIntObjectMap<List<List<Interval>>> chrNumber2OverlappingIntervalsListListMap = null;
-		
-				
-		//long timeBefore = Long.MIN_VALUE;
-		//long timeAfter = Long.MIN_VALUE;
-				
-		/*********************************************************************************************/
-		/****************** Segment Tree starts*******************************************************/
-		/*********************************************************************************************/			
-		//long segmentTreeTotalTime = 0l;
-		//long oneSegmentTreeTotalTime = 0l;
-		//long lowestOneSegmentTreeTotalTime = Long.MAX_VALUE;
-
-		
-		//Segment Tree
-//		for(int j=0; j < numberofRepetations; j++){
-			
-			//FOR JOA GUI have this
-			//JointOverlapAnalysis.appendNewTextToLogArea("Joint Overlap Analysis using Segment Tree started.");
-			//FOR JOA GUI
-			
-			//Initialize
-			//oneSegmentTreeTotalTime=0l;
-			
-			//timeBefore = System.currentTimeMillis();
-			
-			SegmentTree.createForkJoinPool();
-							
-			//Keeps list of overlapping intervals and their common overlap
-			chrNumber2OverlappingIntervalsListListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased(
-					numberofIntervalSetInputFiles,
-					intervalSetsFileNames);
-			
-			SegmentTree.shutdownForkJoinPool();
-
-			//timeAfter = System.currentTimeMillis();				
-			//segmentTreeTotalTime += timeAfter-timeBefore;
-			
-			//oneSegmentTreeTotalTime = timeAfter-timeBefore;
-			
-//			if(oneSegmentTreeTotalTime < lowestOneSegmentTreeTotalTime) {
-//				lowestOneSegmentTreeTotalTime = oneSegmentTreeTotalTime;
-//			}
-
-						
-			//FOR JOA GUI have this
-			//JointOverlapAnalysis.appendNewTextToLogArea("Joint Overlap Analysis using Segment Tree ended.");
-			//FOR JOA GUI
-
-										
-//		}//End of number of repetitions
-										
-				
-		//For JOA GUI have this
-		//String userWorkingDirectory = System.getProperty("user.dir");
-		//JointOverlapAnalysis.appendNewTextToLogArea("Output is provided under " + userWorkingDirectory + System.getProperty("file.separator") + "JointlyOverlappingIntervals.txt");
-		//write(chrNumber2OverlappingIntervalsListListMap,intervalSetsFileNames.length, userWorkingDirectory + System.getProperty("file.separator") + "JointlyOverlappingIntervals.txt");
-		//JointOverlapAnalysis.appendNewTextToLogArea("#######################################################");
-		//For JOA GUI
+	
+		SegmentTree.createForkJoinPool();
+		chrNumber2OverlappingIntervalsListListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased(
+				numberofIntervalSetInputFiles,
+				intervalSetsFileNames);
+		SegmentTree.shutdownForkJoinPool();
 
 
-		//Debugging starts
-		//Write overlapping intervals to stdout
-		writeToStdOut(chrNumber2OverlappingIntervalsListListMap,intervalSetsFileNames.length,outputType);
-		//Debugging ends											
-		/***********************************************************************************************************/
-		/******************Segment Tree ends*********************************************************/
-		/***********************************************************************************************************/
+		writeToStdOutAll(chrNumber2OverlappingIntervalsListListMap,intervalSetsFileNames.length);
+		chrNumber2OverlappingIntervalsListListMap = null;
 		
 	}
 	//October 18, 2017 ends
@@ -562,148 +583,57 @@ public class JointOverlapAnalysis {
 	public static void constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly(
 			int presetValue,
 			IndexingLevelDecisionMode mode,
-			int numberofRepetations,
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames,
-			//BufferedWriter bufferedWriter,
 			int numberofPercent,
 			SearchMethod searchMethod) throws IOException {
 				
 		//Overlapping Intervals found by Indexed Segment Tree Forest
 		TIntObjectMap<List<Interval>> chrNumber2ResultingIntervalListMap = null;
-		
-		//long startTime1, startTime2, readConstructSearchTime, writeOutputTime, totalTime;
-				
-		SegmentTree.createForkJoinPool();
-		
-//		for(int i=0; i < numberofRepetations; i++){
-			
-			//startTime1 = System.nanoTime();		
-			//Keeps list of overlapping intervals and their common overlap
-			//bufferedWriter is added for debug
-			chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
+						
+		SegmentTree.createForkJoinPool();		
+		chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
 					presetValue,
 					mode,
 					numberofIntervalSetInputFiles,
 					intervalSetsFileNames,
 					numberofPercent,
 					searchMethod);
-			//readConstructSearchTime = System.nanoTime()-startTime1;
-			
-			//startTime2 = System.nanoTime();					
-			//write to std out
-			writeToStdOut(chrNumber2ResultingIntervalListMap);
-			//writeOutputTime = System.nanoTime()-startTime2;
-			
-			//totalTime = System.nanoTime()-startTime1;
-
-//			//for runtime searchtime analysis
-//			if (searchMethod.isNOT_SET()) {
-//				bufferedWriter.write("IndexedSegmentTreeForest" + "\t" + presetValue + "\t" + readConstructSearchTime/Commons.ONE_MILLION_FLOAT + "\t" + writeOutputTime/Commons.ONE_MILLION_FLOAT + "\t" + totalTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));
-//			} else if (searchMethod.isUSING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED()) {
-//				bufferedWriter.write("IndexedSegmentTreeForest_STAR" + "\t" + presetValue + "\t" + readConstructSearchTime/Commons.ONE_MILLION_FLOAT + "\t" + writeOutputTime/Commons.ONE_MILLION_FLOAT + "\t" + totalTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));
-//			}				
-						
-			chrNumber2ResultingIntervalListMap= null;
-			
-//		}//End of for each repetition
-		
-//		bufferedWriter.write("##########################################################################" + System.getProperty("line.separator"));
-
-			
 		SegmentTree.shutdownForkJoinPool();
+		
+		writeToStdOut(chrNumber2ResultingIntervalListMap);
+		chrNumber2ResultingIntervalListMap= null;
+			
 		
 	}	
 	//DEC 14, 2017 ends
 	
 	//Nov 6, 2017 starts
 	//Called for Indexed Segment Tree Forest
+	//Output all overlapping intervals and resulting interval
 	public static void constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
 			int presetValue,
 			IndexingLevelDecisionMode mode,
-			int numberofRepetations,
-			int numberofIntervalSetInputFiles,
+		int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames,
 			int numberofPercent,
-			SearchMethod searchMethod,
-			OutputType outputType) throws IOException {	
+			SearchMethod searchMethod) throws IOException {	
 		
 		//Overlapping Intervals found by Indexed Segment Tree Forest
 		TIntObjectMap<List<List<Interval>>> chrNumber2OverlappingIntervalsListListMap = null;
 					
-		//long timeBefore = Long.MIN_VALUE;
-		//long timeAfter = Long.MIN_VALUE;
-				
-		/***********************************************************************************************************/
-		/******************Indexed Segment Tree Forest starts*******************************************************/
-		/***********************************************************************************************************/			
-		//long indexedSegmentTreeForestTotalTime = 0l;
-		//long forOnceIndexedSegmentTreeForestTotalTime = 0l;
-		//long lowestOneIndexedSegmentTreeForestTotalTime = Long.MAX_VALUE;
-		
-				
-		//Indexed Segment Tree Forest
-//		for(int j=0; j < numberofRepetations; j++){
-			
-			//FOR JOA GUI Have this
-			//JointOverlapAnalysis.appendNewTextToLogArea("Joint Overlap Analysis using Indexed Segment Tree Forest started.");
-			//FOR JOA GUI
-			
-			
-			//Initialize
-			//forOnceIndexedSegmentTreeForestTotalTime=0l;
-			
-			//timeBefore = System.nanoTime();	
-			
-			SegmentTree.createForkJoinPool();
-											
-			//Keeps list of overlapping intervals and their common overlap
-			chrNumber2OverlappingIntervalsListListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased(
-					presetValue,
-					mode,
-					numberofIntervalSetInputFiles,
-					intervalSetsFileNames,
-					numberofPercent,
-					searchMethod);
-						
-			SegmentTree.shutdownForkJoinPool();
+		SegmentTree.createForkJoinPool();
+		chrNumber2OverlappingIntervalsListListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased(
+				presetValue,
+				mode,
+				numberofIntervalSetInputFiles,
+				intervalSetsFileNames,
+				numberofPercent,
+				searchMethod);
+		SegmentTree.shutdownForkJoinPool();
 
-			//timeAfter = System.nanoTime();		
-			
-			//indexedSegmentTreeForestTotalTime += timeAfter-timeBefore;
-			
-			//forOnceIndexedSegmentTreeForestTotalTime = timeAfter-timeBefore;
-			
-//			if (forOnceIndexedSegmentTreeForestTotalTime < lowestOneIndexedSegmentTreeForestTotalTime) {
-//				lowestOneIndexedSegmentTreeForestTotalTime = forOnceIndexedSegmentTreeForestTotalTime;
-//			}
-									
-			//FOR JOA GUI Have this
-			//JointOverlapAnalysis.appendNewTextToLogArea("Joint Overlap Analysis using Indexed Segment Tree Forest ended.");
-			//FOR JOA GUI
-						
-							
-//		}//End of number of repetitions
-												
-		
-		//For JOA GUI Have this
-		//String userWorkingDirectory = System.getProperty("user.dir");
-		//JointOverlapAnalysis.appendNewTextToLogArea("Output is provided under " + userWorkingDirectory + System.getProperty("file.separator") + "JointlyOverlappingIntervals.txt");
-		//write(chrNumber2OverlappingIntervalsListListMap,intervalSetsFileNames.length, userWorkingDirectory + System.getProperty("file.separator") + "JointlyOverlappingIntervals.txt");
-		//JointOverlapAnalysis.appendNewTextToLogArea("#######################################################");
-		//For JOA GUI
-		
-		
-		//Debugging starts
-		//Write overlapping intervals to stdout
-		writeToStdOut(chrNumber2OverlappingIntervalsListListMap,intervalSetsFileNames.length,outputType);
-		//Debugging ends				
-		
-		//Free space
+		writeToStdOutAll(chrNumber2OverlappingIntervalsListListMap,intervalSetsFileNames.length);
 		chrNumber2OverlappingIntervalsListListMap = null;
-		/***********************************************************************************************************/
-		/******************Indexed Segment Tree Forest ends*********************************************************/
-		/***********************************************************************************************************/
 				
 	}	
 	//Nov 6, 2017 ends
@@ -742,8 +672,8 @@ public class JointOverlapAnalysis {
     @Parameter(names={"--percentage", "-pe"})
     int percentage=1;
     
-    @Parameter(names={"--numofRepeats", "-r"})
-    int numberofRepetitions=1;
+//    @Parameter(names={"--numofRepeats", "-r"})
+//    int numberofRepetitions=1;
     
 	@Parameter(names = {"--files","-f"}, variableArity = true)
 	public List<String> filenames = new ArrayList<>();
@@ -793,7 +723,6 @@ public class JointOverlapAnalysis {
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly(
 									joa.preset,
 									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
-									joa.numberofRepetitions,
 									joa.filenames.size(),
 									filesArray,
 									joa.percentage,
@@ -804,7 +733,6 @@ public class JointOverlapAnalysis {
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly(
 									joa.preset,
 									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
-									joa.numberofRepetitions,
 									joa.filenames.size(),
 									filesArray,
 									joa.percentage,
@@ -813,7 +741,6 @@ public class JointOverlapAnalysis {
 							
 						case SEGMENT_TREE:
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_ResultingIntervalOnly(
-			    					joa.numberofRepetitions,
 			    					joa.filenames.size(),
 			    					filesArray);
 							break;
@@ -834,12 +761,11 @@ public class JointOverlapAnalysis {
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
 								joa.preset,
 								IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
-								joa.numberofRepetitions,
+								//joa.numberofRepetitions,
 								joa.filenames.size(),
 								filesArray,
 								joa.percentage,
-								SearchMethod.NOT_SET,
-								outputType);
+								SearchMethod.NOT_SET);
 
 							break;
 						
@@ -847,21 +773,19 @@ public class JointOverlapAnalysis {
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
 									joa.preset,
 									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
-									joa.numberofRepetitions,
+									//joa.numberofRepetitions,
 									joa.filenames.size(),
 									filesArray,
 									joa.percentage,
-									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED,
-									outputType);
+									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED);
 			
 							break;
 							
 						case SEGMENT_TREE:
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree(
-			    					joa.numberofRepetitions,
+			    					//joa.numberofRepetitions,
 			    					joa.filenames.size(),
-			    					filesArray,
-			    					outputType);
+			    					filesArray);
 
 							break;
 						
