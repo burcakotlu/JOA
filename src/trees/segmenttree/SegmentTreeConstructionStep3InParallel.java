@@ -51,7 +51,6 @@ public class SegmentTreeConstructionStep3InParallel extends RecursiveAction{
 	public void compute(){
 		
 		
-		
 		if (lowerChrNumber == upperChrNumber){
 			
 			//What if chrNumber2IntervalsMap.get(lowerChrNumber) is null						

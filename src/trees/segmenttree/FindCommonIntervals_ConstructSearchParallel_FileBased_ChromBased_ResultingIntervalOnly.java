@@ -1,4 +1,5 @@
 /**
+ * This class is for IndexedSegmentTreeForest outputs 1 intervals (only one resulting interval).
  * 
  */
 package trees.segmenttree;
@@ -14,6 +15,14 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import interval.Interval;
+
+
+//for debugging
+//import java.io.BufferedWriter;
+//import java.io.FileWriter;
+//import java.io.IOException;
+//import common.Commons;
+
 
 /**
  * @author Burcak Otlu
@@ -33,7 +42,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_Re
 	private int startFileIndex;
 	private int endFileIndex;
 	private String[] intervalSetsFileNames;
-	private int numberofPercent;
+	private float numberofPercent;
 	private SearchMethod searchMethod;
 	
 	//added for runtime and searchtime analysis later remove
@@ -45,7 +54,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_Re
 			int startFileIndex, 
 			int endFileIndex, 
 			String[] intervalSetsFileNames,
-			int numberofPercent, 
+			float numberofPercent, 
 			SearchMethod searchMethod) {
 		
 		super();
@@ -67,39 +76,57 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_Re
 		TIntObjectMap<List<Interval>> leftPart_chrNumber2OverlappingIntervalsListMap = null;
 		TIntObjectMap<List<Interval>> rightPart_chrNumber2OverlappingIntervalsListMap = null;
 		
-		TIntObjectMap<List<Interval>> startFileIndex_chrNumber2IntervalListMap  = null;
+		TIntObjectMap<List<Interval>> startFileIndex_chrNumber2IntervalListMap  = null;				
 		
-		//Long timeStart,elapsedTime;
-						
+//		//for debugging
+//		Long timeStart;
+//		Long readTime;
+//		Long constructTime;
+//		Long searchTime;
+		
 		if(startFileIndex==endFileIndex) {
+			
+//			//for debugging
+//			timeStart = System.nanoTime();	
 						
 			//Read file with startFileIndex
 			//Fill chr2OverlappingIntervalsListMap using startFileIndex
 			//Return it				
 			startFileIndex_chrNumber2IntervalListMap = SegmentTree.fillChrNumber2OverlappingIntervalsListMap(intervalSetsFileNames[startFileIndex]);
 			
+//			//for debugging
+//			readTime = System.nanoTime()-timeStart;	
+			
+//			//read time
+//			//debug starts			
+//			try {
+//				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("/home/burcak/JOA_BMC_Bioinformatics/JOA_ST_versus_ISTF_Runtime_Comparisons/JOA_ST_versus_ISTF_6M_9M_read_construct_search_runtime.txt", true));
+//				bufferedWriter.write("ISTF\t" + "numberofPercent:" + numberofPercent + "\t" + readTime/Commons.ONE_MILLION_FLOAT + "\t*\t*" + System.getProperty("line.separator"));		
+//				bufferedWriter.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			//debug ends			
+			
 			return startFileIndex_chrNumber2IntervalListMap;
 			
 		}else if((endFileIndex-startFileIndex)==1) {
 										
-				/**************************************************************************************************/
-				//timeStart = System.nanoTime();	
+				/**************************************************************************************************/				
+//				//for debugging
+//				timeStart = System.nanoTime();	
 			
 				//Read file with startFileIndex
 				//Fill chr2OverlappingIntervalsListMap using startFileIndex
 				startFileIndex_chrNumber2IntervalListMap = SegmentTree.fillChrNumber2OverlappingIntervalsListMap(intervalSetsFileNames[startFileIndex]);
 				
-				//elapsedTime = System.nanoTime()-timeStart;			
-				//write to bufferedWriter elapsedTime as read time
-				//try {
-				//	bufferedWriter.write(elapsedTime/Commons.ONE_MILLION_FLOAT + "\t");
-				//} catch (IOException e) {
-				//	e.printStackTrace();
-				//}
+//				//for debugging
+//				readTime = System.nanoTime()-timeStart;			
 				/**************************************************************************************************/
 				
 				/**************************************************************************************************/
-				//timeStart = System.nanoTime();
+//				//for debugging
+//				timeStart = System.nanoTime();
 				
 				//Construct parallel chrom based indexed segment tree forest by reading the intervals in endFileIndex
 				TIntObjectMap<TIntObjectMap<SegmentTreeNode>> endFileIndex_chrNumber2HashIndex2SegmentTreeNodeMapMap = JointOverlapAnalysis.constructIndexedSegmentTreeForestParallelInChromBased(
@@ -107,41 +134,44 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_Re
 						presetValue,
 						intervalSetsFileNames[endFileIndex],
 						numberofPercent);				
-				//elapsedTime = System.nanoTime()-timeStart;			
-//				//write to bufferedWriter elapsedTime as construction time
-//				try {
-//					bufferedWriter.write(elapsedTime/Commons.ONE_MILLION_FLOAT + "\t");
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
+				
+				
+//				//for debugging
+//				constructTime = System.nanoTime()-timeStart;				
 				/**************************************************************************************************/
 				
 				
 				/**************************************************************************************************/
-				//timeStart = System.nanoTime();			
+//				//for debugging
+//				timeStart = System.nanoTime();			
+				
 				//Find overlapping intervals Search parallel chrom based
 				SegmentTree.searchInParallelChromosomeBased_ResultingIntervalOnly(
 						presetValue,
 						startFileIndex_chrNumber2IntervalListMap,
 						endFileIndex_chrNumber2HashIndex2SegmentTreeNodeMapMap,
 						searchMethod);
-				//elapsedTime = System.nanoTime()-timeStart;		
-												
-//				//For now original code. But remove later.
-//				try {							
-//					//former it was
-//					bufferedWriter.write(elapsedTime/Commons.ONE_MILLION_FLOAT + "\t");
+				
+//				//for debugging				
+//				searchTime = System.nanoTime()-timeStart;		
+
+//				//search time
+//				//debug starts
+//				try {
+//					BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("/home/burcak/JOA_BMC_Bioinformatics/JOA_ST_versus_ISTF_Runtime_Comparisons/JOA_ST_versus_ISTF_6M_9M_read_construct_search_runtime.txt", true));
+//					bufferedWriter.write("ISTF\t" +  "numberofPercent:" + numberofPercent + "\t" + readTime/Commons.ONE_MILLION_FLOAT + "\t" + constructTime/Commons.ONE_MILLION_FLOAT + "\t" + searchTime/Commons.ONE_MILLION_FLOAT + System.getProperty("line.separator"));
+//					bufferedWriter.close();
 //				} catch (IOException e) {
 //					e.printStackTrace();
 //				}
+//				//debug ends
 				/**************************************************************************************************/
 							
 						
 				//for less memory usage
 				endFileIndex_chrNumber2HashIndex2SegmentTreeNodeMapMap = null;
-				
-				return startFileIndex_chrNumber2IntervalListMap;
-							
+								
+				return startFileIndex_chrNumber2IntervalListMap;							
 			
 		} else {
 			
@@ -176,8 +206,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_Re
 					rightPart_chrNumber2OverlappingIntervalsListMap,
 					numberofPercent,
 					searchMethod);
-		}	
-		
+		}				
 		
 	}
 	
@@ -187,7 +216,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_Re
 			int presetValue,
 			TIntObjectMap<List<Interval>> leftPart_chrNumber2OverlappingIntervalsListMap,
 			TIntObjectMap<List<Interval>> rightPart_chrNumber2OverlappingIntervalsListMap,
-			int numberofPercent,
+			float numberofPercent,
 			SearchMethod searchMethod){
 		
 		//Step1 is already at hand
@@ -227,7 +256,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_Re
 			IndexingLevelDecisionMode mode,
 			int presetValue,
 			TIntObjectMap<List<Interval>> chrNumber2IntervalListMap,
-			int numberofPercent){
+			float numberofPercent){
 				
 			
 			//Nov 2,2017 to avoid rehash, initialize with number of chromosomes which is 25

@@ -130,7 +130,7 @@ public class ConstructIndexedSegmentTreeForestStep4InParallelInChromBased extend
 				//Step6 Construct hashIndex2SegmentTreeNodeMap
 				//For collisions construct BST for the nodes with the same index and now index points to the root of the BST
 				hashIndex2SegmentTreeNodeMap = new TIntObjectHashMap<SegmentTreeNode>();
-				SegmentTree.fill(hashIndex2SegmentTreeNodeMap,hashIndex2SegmentTreeNodeListMap);
+				SegmentTree.constructBSTfromList(hashIndex2SegmentTreeNodeMap,hashIndex2SegmentTreeNodeListMap);
 									
 				//Put it into map
 				chrNumber2HashIndex2SegmentTreeNodeMapMap.put(chrNumber, hashIndex2SegmentTreeNodeMap);

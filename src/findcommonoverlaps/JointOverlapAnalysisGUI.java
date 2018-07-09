@@ -1,5 +1,8 @@
 /**
- * 
+ * JointOverlapAnalysisGUI is the starting point of Joint Overlap Analysis
+ * In the main function, the program arguments are parsed
+ * If there are valid program arguments after joa.jar, JOA run with command line parameters
+ * Else JOA GUI is opened and JOA run with the user provided parameters.
  */
 package findcommonoverlaps;
 
@@ -40,6 +43,11 @@ import enumtypes.OutputType;
 import enumtypes.SearchMethod;
 
 
+//for debugging
+//import java.io.BufferedWriter;
+//import java.io.FileWriter;
+
+
 /**
  * @author Burcak Otlu 
  * @date Nov 16, 2017
@@ -56,7 +64,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
 	
 	
 	static JTextArea logArea = new JTextArea(6,50);
-	
 	
 	
 	public static void appendNewTextToLogArea( String text) {
@@ -83,7 +90,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
 	
 
 
-	
 	public static void addNewIntervalSetPanel(
 			JPanel mainPanel, 
 			JPanel intervalSetFilesPanel,
@@ -128,7 +134,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
             	intervalSetFilesPanel.remove(intervalSetFilePanel);
             	frame.pack();
                 
-
             }
         });	
 		
@@ -150,9 +155,8 @@ public class JointOverlapAnalysisGUI extends JPanel{
         constraints.gridwidth = 1;        
         constraints.gridheight = 1;
         intervalSetFilePanel.add(removeButton, constraints);
-        
-        
-        //Where to put?
+                
+        //Put at numberofIntervalSetFiles++ 
         constraints.gridx = 0;
         constraints.gridy = numberofIntervalSetFiles++; 
         constraints.gridheight =1;
@@ -179,7 +183,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
 		//Therefore graphics are drawn on mainPanel
 		frame.setLayout(new GridBagLayout());
 
-	
 		GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.PAGE_START;
         constraints.insets = new Insets(5, 5, 5, 5);
@@ -474,8 +477,6 @@ public class JointOverlapAnalysisGUI extends JPanel{
         /**********Parameter Panel ends************/
         /******************************************/
 		
-
-
 		
 	    /******************************************/
         /**********Run Panel starts****************/
@@ -505,9 +506,8 @@ public class JointOverlapAnalysisGUI extends JPanel{
             	int preset = 1000000;
             	
                 //Set default numberofPercent
-                int numberofPercent = 1;
- 
-            	
+                float numberofPercent = 0.5f;
+             	
             	List<String> intervalSetFiles =  new ArrayList<String>();
             	String outputFile = outputFileTextField.getText();
             	
@@ -536,13 +536,11 @@ public class JointOverlapAnalysisGUI extends JPanel{
 
                 //Check whether interval set files are entered
                 boolean valid = checkIntervalSetFileNamesStringArrayforGUI(intervalSetFilesArray);
-               
-                  
+                                 
                 try {
                 	
                 	DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                	
-                	
+                	                	
                 	if (valid) {
                 		
                 		logArea.setText(null);
@@ -552,10 +550,9 @@ public class JointOverlapAnalysisGUI extends JPanel{
             			appendNewTextToLogArea("Output type: " + outputTypeColumn.getSelectedItem().toString() + ".");
             			
 
-                		//OutputType Only
+                		//OutputType Only Resulting Interval
                 		if (outputTypeColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.ONLY_RESULTING_INTERVAL_GUI)) {
-                			
-                			
+                			                			
                 			//ST
                 			if(dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.SEGMENT_TREE_GUI)) {
                 				
@@ -565,17 +562,19 @@ public class JointOverlapAnalysisGUI extends JPanel{
                 			}
                 			//ISTF
                 			else if(dataStructureColumn.getSelectedItem().toString().equalsIgnoreCase(Commons.INDEXED_SEGMENT_TREE_FOREST_GUI)) {
-                				
-    							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly_GUI(
+                					            						            						
+        						JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly_GUI(
     									preset,
     									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
     									intervalSetFilesArray,
     									numberofPercent,
     									SearchMethod.NOT_SET,
     									outputFile);
-
+	            					                					       
                 			}
+                			//This is not used 
                 			//ISTF using last overlapping linked node
+    						//Not provided in the GUI and the JOA readthedocs					
                 			else {
                 				
                 				JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly_GUI(
@@ -614,7 +613,9 @@ public class JointOverlapAnalysisGUI extends JPanel{
     									outputFile);
 
                 			}
+                			//Not used
                 			//ISTF using last overlapping linked node
+    						//Not provided in the GUI and the JOA readthedocs					
                 			else {
                 				
     							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_GUI(
@@ -924,6 +925,7 @@ public class JointOverlapAnalysisGUI extends JPanel{
 									SearchMethod.NOT_SET);
 							break;
 						
+						//Not provided in the GUI and the JOA readthedocs					
 						case INDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE:
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly(
 									joa.preset,
@@ -946,7 +948,9 @@ public class JointOverlapAnalysisGUI extends JPanel{
 							
 					}//End of switch
 					
-				}else {
+				}
+				//Takes more time. All n overlapping intervals and the resulting interval
+				else {
 					
 					switch(treeType) {
 					
@@ -961,6 +965,7 @@ public class JointOverlapAnalysisGUI extends JPanel{
 									SearchMethod.NOT_SET);
 							break;
 						
+						//Not provided in the GUI and the JOA readthedocs					
 						case INDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE:
 							
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(

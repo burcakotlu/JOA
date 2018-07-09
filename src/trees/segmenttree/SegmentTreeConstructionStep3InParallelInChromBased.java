@@ -26,7 +26,7 @@ public class SegmentTreeConstructionStep3InParallelInChromBased extends Recursiv
 	private TIntObjectMap<int[]> chrNumber2SortedEndPointsArrayMap;
 	private TIntObjectMap<List<Interval>> chrNumber2IntervalsMap;
 	private TIntIntMap chrNumber2IndexingLevelMap;
-	private int numberofPercent;
+	private float numberofPercent;
 	
 	public SegmentTreeConstructionStep3InParallelInChromBased(
 			int lowerChrNumber, 
@@ -34,7 +34,7 @@ public class SegmentTreeConstructionStep3InParallelInChromBased extends Recursiv
 			TIntObjectMap<int[]> chrNumber2SortedEndPointsArrayMap,
 			TIntObjectMap<List<Interval>> chrNumber2IntervalsMap,
 			TIntIntMap chrNumber2IndexingLevelMap,
-			int numberofPercent){
+			float numberofPercent){
 		
 		this.lowerChrNumber = lowerChrNumber;
 		this.upperChrNumber = upperChrNumber;
@@ -65,7 +65,8 @@ public class SegmentTreeConstructionStep3InParallelInChromBased extends Recursiv
 				chrNumber2SegmentTreeRootNodeMap.put(lowerChrNumber, root);
 				
 				//Calculate indexingLevel from levelNumber2NumberofIntervalsMap
-				int indexingLevel = SegmentTree.calculateIndexingLevel(levelNumber2NumberofIntervalsMap,numberofPercent);
+				//June 4 , 2018, chrNumber parameter is added for debug purposes
+				int indexingLevel = SegmentTree.calculateIndexingLevelFromLeafLevelStartingAt1(lowerChrNumber,levelNumber2NumberofIntervalsMap,numberofPercent);
 				
 				//This part is added
 				chrNumber2IndexingLevelMap.put(lowerChrNumber,indexingLevel);

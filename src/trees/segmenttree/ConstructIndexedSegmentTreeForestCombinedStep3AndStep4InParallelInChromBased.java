@@ -3,10 +3,15 @@
  */
 package trees.segmenttree;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.RecursiveTask;
 
 import enumtypes.IndexingLevelDecisionMode;
+import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -30,19 +35,17 @@ public class ConstructIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInC
 	private int upperChrNumber;
 	private TIntObjectMap<int[]> chrNumber2SortedEndPointsArrayMap;
 	private TIntObjectMap<List<Interval>> chrNumber2IntervalsMap;
-	private int numberofPercent;	
+	private float numberofPercent;	
 	private IndexingLevelDecisionMode mode;
 	private int presetValue;
-	
-	
-	
+			
 	
 	public ConstructIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInChromBased(
 			int lowerChrNumber,
 			int upperChrNumber, 
 			TIntObjectMap<int[]> chrNumber2SortedEndPointsArrayMap,
 			TIntObjectMap<List<Interval>> chrNumber2IntervalsMap, 
-			int numberofPercent, 
+			float numberofPercent, 
 			IndexingLevelDecisionMode mode,
 			int presetValue) {
 		
@@ -55,8 +58,71 @@ public class ConstructIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInC
 		this.mode = mode;
 		this.presetValue = presetValue;
 	}
+	
+	//for debug
+	//For JOA BMC Bioinformatics response to reviewers
+	public void writeLevelNumber2IntervalsMap(int chrNumber,TIntIntMap levelNumber2NumberofIntervalsMap) {
+		
+		try {
+			
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Users\\burcak\\git\\JOA\\JOA_log.txt", true));
+				
+			if (chrNumber==1) {
+				for (TIntIntIterator itr=levelNumber2NumberofIntervalsMap.iterator();itr.hasNext();) {
+					itr.advance();
+					int levelNumber = itr.key();
+					int numberofIntervalsAtThisLevel = itr.value(); 
+					bufferedWriter.write("levelNumber: " + levelNumber +  " numberofIntervalsAtThisLevel: " + numberofIntervalsAtThisLevel +  System.getProperty("line.separator"));		 
+				}//End of For
+			}
+			
+			bufferedWriter.close();
+			
+		} catch (IOException e) {
+			// TODO: handle exception
+		}					
+		
+	}
 
+	//For JOA BMC Bioinformatics response to reviewers
+	public void analyseHeightofHashIndexBSTs(int chrNumber, float numberofPercent,SegmentTreeNode root, int cutoffLevelFromLeafLevel,TIntObjectMap<SegmentTreeNode> hashIndex2SegmentTreeNodeMap) {
+		SegmentTreeNode hashIndexBSTRoot = null;
+		
+		//Accumulate the height of the BST  trees
+		//Find the average height of BST
+		int accumulatedHeights = 0;
+		float averageHeight = 0.0f;
 
+//		if (chrNumber==1) {
+			
+			try {
+				
+				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Users\\burcak\\git\\JOA\\JOA_log2.txt", true));
+				
+				for(TIntObjectIterator<SegmentTreeNode> itr=hashIndex2SegmentTreeNodeMap.iterator();itr.hasNext();){			
+					
+					itr.advance();
+					hashIndexBSTRoot = itr.value();
+					
+					accumulatedHeights += hashIndexBSTRoot.getLevel();
+										
+					if (root.level <=  hashIndexBSTRoot.getLevel()) {
+						bufferedWriter.write("original segment tree root.level:" + root.getLevel() + " indexingLevel from leaf: " + cutoffLevelFromLeafLevel + " hashIndexBSTRoot.getLevel(): " + hashIndexBSTRoot.getLevel() + System.getProperty("line.separator"));	
+					}				
+					
+				}//End of for
+				
+				averageHeight = (accumulatedHeights*1.0f)/hashIndex2SegmentTreeNodeMap.size();
+				bufferedWriter.write("chrNumber\t" + chrNumber +"\tnumberofPercent\t" + numberofPercent +"\tOriginal segment tree root.level\t" + root.getLevel() + "\tAverage height of BSTs\t" + averageHeight + "\tNumber of hash indexes\t" + hashIndex2SegmentTreeNodeMap.size() + System.getProperty("line.separator"));
+				
+				bufferedWriter.close();
+			} catch (IOException e) {
+				// TODO: handle exception
+			}
+
+//		}
+	
+	}
 
 
 	protected TIntObjectMap<TIntObjectMap<SegmentTreeNode>> compute() {
@@ -65,7 +131,6 @@ public class ConstructIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInC
 		if (lowerChrNumber == upperChrNumber){
 			
 			TIntObjectMap<SegmentTreeNode> chrNumber2SegmentTreeRootNodeMap = new TIntObjectHashMap<SegmentTreeNode>();
-			int hashTableWillBeConstructedAtThisLevel = -1;
 			
 			TIntObjectMap<List<SegmentTreeNode>> hashIndex2SegmentTreeNodeListMap = null;		
 			
@@ -91,8 +156,23 @@ public class ConstructIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInC
 				SegmentTreeNode root = SegmentTree.constructSegmentTree(chrNumber2SortedEndPointsArrayMap.get(lowerChrNumber),intervals,levelNumber2NumberofIntervalsMap);
 				chrNumber2SegmentTreeRootNodeMap.put(lowerChrNumber, root);
 				
+				
+//				//June 4, 2018
+//				//debug starts
+//				//Write down the segment tree in breadth first order
+//				SegmentTree.breadthFirstTraversal(root);
+//				//debug ends
+				
+				//June 4, 2018
+				//debug starts
+				//writeLevelNumber2IntervalsMap(lowerChrNumber,levelNumber2NumberofIntervalsMap);
+				//debug ends
+				
+				//Cutoff level decision is made here
 				//Calculate indexingLevel from levelNumber2NumberofIntervalsMap
-				int indexingLevel = SegmentTree.calculateIndexingLevel(levelNumber2NumberofIntervalsMap,numberofPercent);
+				//leaf level starts at 1
+				//June 4 , 2018, chrNumber parameter is added for debug purposes
+				int cutoffLevelFromLeafLevel = SegmentTree.calculateIndexingLevelFromLeafLevelStartingAt1(lowerChrNumber,levelNumber2NumberofIntervalsMap,numberofPercent);
 				/***********************************************************/
 				/************* Step3 ends **********************************/
 				/***********************************************************/				
@@ -100,9 +180,7 @@ public class ConstructIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInC
 				
 				/***********************************************************/
 				/************* Step4 starts*********************************/
-				/***********************************************************/				
-				hashTableWillBeConstructedAtThisLevel = root.getLevel()-indexingLevel+1;
-				
+				/***********************************************************/								
 				//Construct indexed segment tree forest at the decided level
 				hashIndex2SegmentTreeNodeListMap = new TIntObjectHashMap<List<SegmentTreeNode>>();
 				
@@ -122,24 +200,38 @@ public class ConstructIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInC
 //						presetValue);
 				
 				
+				//TODO debug here  June 2, 2018
 				//Old way
 				//get the nodeList and during this process move intervals downward till the cutoff level
+//				SegmentTree.fillCompositeDataStructureAndCopyAssociatedIntervals(
+//						root,
+//						cutoffLevelFromRootLevel,
+//						hashIndex2SegmentTreeNodeListMap,
+//						presetValue);
+				
+				
 				SegmentTree.fillCompositeDataStructureAndCopyAssociatedIntervals(
 						root,
-						hashTableWillBeConstructedAtThisLevel,
+						cutoffLevelFromLeafLevel,
 						hashIndex2SegmentTreeNodeListMap,
 						presetValue);
 				
-				
+								
 									
 				//Step5 Put forward and backward links between segment tree nodes where the hash table is constructed at.
 				SegmentTree.connectOriginalNodes(hashIndex2SegmentTreeNodeListMap);
 				
+				//June 2, 2018
+				//What is the height of  the hashIndexBST?
 				//Step6 Construct hashIndex2SegmentTreeNodeMap
 				//For collisions construct BST for the nodes with the same index and now hash index points to the root of the BST
 				hashIndex2SegmentTreeNodeMap = new TIntObjectHashMap<SegmentTreeNode>();
-				SegmentTree.fill(hashIndex2SegmentTreeNodeMap,hashIndex2SegmentTreeNodeListMap);
+				SegmentTree.constructBSTfromList(hashIndex2SegmentTreeNodeMap,hashIndex2SegmentTreeNodeListMap);
 				
+				//JOA BMC Bioinformatics analysis starts
+				//analyseHeightofHashIndexBSTs(lowerChrNumber,numberofPercent,root,cutoffLevelFromLeafLevel,hashIndex2SegmentTreeNodeMap);
+				//JOA BMC Bioinformatics analysis ends
+												
 				//for less memory usage
 				hashIndex2SegmentTreeNodeListMap = null;
 				chrNumber2IntervalsMap.put(lowerChrNumber, null);
@@ -150,8 +242,7 @@ public class ConstructIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInC
 				/***********************************************************/
 				/************* Step4 ends **********************************/
 				/***********************************************************/		
-											
-				
+												
 			}
 		
 			return chrNumber2HashIndex2SegmentTreeNodeMapMap;
@@ -192,6 +283,7 @@ public class ConstructIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInC
 	}
 	
 	
+
 	public TIntObjectMap<TIntObjectMap<SegmentTreeNode>> combine(
 			TIntObjectMap<TIntObjectMap<SegmentTreeNode>> leftChrNumber2HashIndex2SegmentTreeNodeMapMap,
 			TIntObjectMap<TIntObjectMap<SegmentTreeNode>> rightChrNumber2HashIndex2SegmentTreeNodeMapMap){

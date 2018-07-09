@@ -1,5 +1,5 @@
 /**
- * 
+ *  This class is for IndexedSegmentTreeForest outputs n+1 intervals (all the n overlapping intervals and one resulting interval).
  */
 package trees.segmenttree;
 
@@ -29,7 +29,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased  e
 	private int startFileIndex;
 	private int endFileIndex;
 	private String[] intervalSetsFileNames;
-	private int numberofPercent;
+	private float numberofPercent;
 	private SearchMethod searchMethod;
 	
 	
@@ -39,7 +39,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased  e
 			int startFileIndex,
 			int endFileIndex, 
 			String[] intervalSetsFileNames,
-			int numberofPercent,
+			float numberofPercent,
 			SearchMethod searchMethod) {
 		
 		super();
@@ -148,7 +148,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased  e
 			int presetValue,
 			TIntObjectMap<List<List<Interval>>> leftPart_chrNumber2OverlappingIntervalsListListMap,
 			TIntObjectMap<List<List<Interval>>> rightPart_chrNumber2OverlappingIntervalsListListMap,
-			int numberofPercent,
+			float numberofPercent,
 			SearchMethod searchMethod){
 		
 		
@@ -193,7 +193,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased  e
 			IndexingLevelDecisionMode mode,
 			int presetValue,
 			TIntObjectMap<List<List<Interval>>> chrNumber2IntervalListListMap,
-			int numberofPercent){
+			float numberofPercent){
 				
 			
 			//Nov 2,2017 to avoid rehash, initialize with number of chromosomes which is 24

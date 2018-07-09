@@ -158,11 +158,13 @@ public class SegmentTree {
 						if(endPointsList== null){
 							endPointsList = new TIntArrayList();
 							endPointsList.add(lowerEndPoint);
-							endPointsList.add(higherEndPoint);
+							//June 4, 2018
+							endPointsList.add(higherEndPoint-1);
 							chrNumber2UnSortedEndPoints.put(chrNumber, endPointsList);
 						}else{
 							endPointsList.add(lowerEndPoint);
-							endPointsList.add(higherEndPoint);
+							//June 4, 2018
+							endPointsList.add(higherEndPoint-1);
 						}
 												
 						
@@ -220,7 +222,7 @@ public class SegmentTree {
 	public static TIntObjectMap<TIntObjectMap<SegmentTreeNode>> constructSegmentTreeAndIndexedSegmentTreeForestCombinedStep3AndStep4InParallelInChromBased(
 			TIntObjectMap<int[]>  chrNumber2SortedEndPointsArrayMap,
 			TIntObjectMap<List<Interval>> chrNumber2IntervalsMap,
-			int numberofPercent,		
+			float numberofPercent,		
 			IndexingLevelDecisionMode mode,
 			int presetValue){
 		
@@ -326,7 +328,7 @@ public class SegmentTree {
 			TIntObjectMap<int[]> chrNumber2SortedEndPointsArrayMap,			
 			TIntObjectMap<List<Interval>> chrNumber2IntervalsMap,
 			TIntIntMap chrNumber2IndexingLevelMap,
-			int numberofPercent){
+			float numberofPercent){
 		
 		
 		//Data for chromosomes may not exist
@@ -359,6 +361,25 @@ public class SegmentTree {
 		SegmentTreeNode formerNode =null;
 		SegmentTreeNode inBetweenNode =null;
 		SegmentTreeNode node =null;
+
+//		//June 4, 2018 
+//		//debug starts
+//		//Write down the sorted end points
+//		try {
+//			
+//			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Users\\burcak\\git\\JOA\\JOA_log.txt", true));			
+//			bufferedWriter.write("Sorted End Points" + System.getProperty("line.separator"));
+//			
+//			for(int i=0; i<sortedEndPoints.length; i++){				
+//				bufferedWriter.write(sortedEndPoints[i] + System.getProperty("line.separator"));								
+//			}
+//			
+//			bufferedWriter.close();
+//		
+//		} catch (IOException e) {
+//			// TODO: handle exception
+//		}
+//		//debug ends
 		
 		//Leaf level starts with 1.
 		//All leaves have level of 1		
@@ -472,7 +493,7 @@ public class SegmentTree {
 				
 		SegmentTreeNode node = null;
 		List<SegmentTreeNode> higherLevelNodes= null; 
-		
+				
 		do{
 		
 			higherLevelNodes = new ArrayList<SegmentTreeNode>(); 
@@ -499,6 +520,7 @@ public class SegmentTree {
 			//Go to the next level
 			elementarySegmentNodes = new SegmentTreeNode[higherLevelNodes.size()];
 			higherLevelNodes.toArray(elementarySegmentNodes);
+			
 			
 		}while (higherLevelNodes.size()>1);
 		
@@ -694,6 +716,18 @@ public class SegmentTree {
 			level = node.getLevel();
 			levelNumber2NumberofIntervalsMap.put(level,levelNumber2NumberofIntervalsMap.get(level)+1);
 			
+//			//debug starts
+//			//June 4, 2018
+//			try {				
+//				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Users\\burcak\\git\\JOA\\JOA_log.txt", true));
+//				bufferedWriter.write("SegmentTreeNode" + "\tlow: " + node.getSegment().getLowerEndPoint() + "\thigh: " + node.getSegment().getHigherEndPoint() + "\tlevel: " + node.getLevel() + "\tInterval: " + interval.getLowerEndPoint() + "\t" + interval.getHigherEndPoint() + System.getProperty("line.separator"));
+//				bufferedWriter.close();
+//			} catch (IOException e) {
+//				// TODO: handle exception
+//			}
+//			//debug starts
+
+			
 		}
 		
 		//If node is subset of the interval do not consider its children
@@ -719,18 +753,33 @@ public class SegmentTree {
 	
 	
 	
-	
-
+	//June 9, 2018 
+	//Store unsorted intervals
+	//Used by Segment Tree
+	public static void storeUnsortedIntervals(SegmentTreeNode root,Interval[] intervals){
+		
+		Interval interval =null;
+		
+		for(int i=0; i<intervals.length; i++){
+			
+			interval = intervals[i];
+			
+			if ( (interval.getLowerEndPoint()>root.getSegment().getHigherEndPoint())  || (interval.getHigherEndPoint()<root.getSegment().getLowerEndPoint()) ) {
+				continue;
+			}	
+			else {
+				SegmentTree.updateCanonicalSubsets(root,intervals[i]);					
+			}
+			
+		}
+		
+	}
 	
 	
 	//Called from NIntervalSetIntersection
 	//Used by Segment Tree
+	//Requires sorted intervals
 	public static void storeIntervals(SegmentTreeNode root,Interval[] intervals){
-
-		//old code inefficiemt
-//		for(int i=0; i<intervals.length;i++){
-//			updateCanonicalSubsets(root,intervals[i]);
-//		}
 		
 		//DEC 1, 2017 starts
 		Interval interval =null;
@@ -788,15 +837,42 @@ public class SegmentTree {
 	//DEC 4, 2017 ends
 	
 	
+	
+	//June 9, 2018
+	//Store unsorted intervals
+	//Used by indexed segment tree forest
+	//Do not require sorted intervals
+	public static void storeUnsortedIntervals(SegmentTreeNode node,Interval[] intervals,TIntIntMap levelNumber2NumberofIntervalsMap){
+		
+		Interval interval =null;
+		
+		for(int i=0; i<intervals.length; i++){
+			
+			interval = intervals[i];
+			
+			if ( (interval.getLowerEndPoint()>node.getSegment().getHigherEndPoint())  || (interval.getHigherEndPoint()<node.getSegment().getLowerEndPoint()) ) {
+				continue;
+			}else {
+				updateCanonicalSubsets(node,intervals[i],levelNumber2NumberofIntervalsMap);
+			}
+			
+		}
+		
+		
+	}
 
 	
 	//26 April 2017
 	//Used by Indexed Segment Tree Forest
+	//Requires sorted intervals
+	//TODO come here and investigate how much break and continue helps?
+	//Do we need to provide sorted intervals? if break and continue really helps in this for loop? 
 	public static void storeIntervals(SegmentTreeNode node,Interval[] intervals,TIntIntMap levelNumber2NumberofIntervalsMap){
-	
+
+//		//June 4, 2018 I reopened this since our intervals are not sorted
 //		//old code this was inefficient
 //		for(int i=0; i<intervals.length;i++){
-//			updateCanonicalSubsets(root,intervals[i],levelNumber2NumberofIntervalsMap);
+//			updateCanonicalSubsets(node,intervals[i],levelNumber2NumberofIntervalsMap);
 //		}		
 		
 		//DEC 1, 2017 starts
@@ -816,17 +892,16 @@ public class SegmentTree {
 			
 		}
 		//DEC 1, 2017 ends
-
 		
 	}
 	
-	public static void storeIntervals(SegmentTreeNode root, List<Interval>  intervals){
-		
-		for(Interval interval:intervals){			
-			updateCanonicalSubsets(root,interval);
-		}//end of for each original interval
-		
-	}
+//	public static void storeIntervals(SegmentTreeNode root, List<Interval>  intervals){
+//		
+//		for(Interval interval:intervals){			
+//			updateCanonicalSubsets(root,interval);
+//		}//end of for each original interval
+//		
+//	}
 	
 	
 
@@ -1022,12 +1097,23 @@ public class SegmentTree {
 	//Find the rightmost node where backwardNode or forwardNode , at least one of them is not null
 	// which means that it is an original node at the level where hash table is constructed
 	public static SegmentTreeNode findRightMostLinkedNode(SegmentTreeNode node){
-				
+
+		//Before it was like this
+//		if (node!=null && (node.getBackwardNode()!=null || node.getForwardNode()!=null)){
+//			return node;
+//		}else{
+//			return findRightMostLinkedNode(node.getRight());
+//		}
+
+		//July 4, 2018
 		if (node!=null && (node.getBackwardNode()!=null || node.getForwardNode()!=null)){
 			return node;
-		}else{
+		}else if (node!=null){
 			return findRightMostLinkedNode(node.getRight());
+		}else {
+			return null;
 		}
+
 		
 	}
 	
@@ -1037,11 +1123,20 @@ public class SegmentTree {
 	//Find the leftmost node where backwardNode or forwardNode , at least one of them is not null
 	// which means that it is an original node at the level where hash table is constructed
 	public static SegmentTreeNode findLeftMostLinkedNode(SegmentTreeNode node){
-				
+		//Before it was like this		
+//		if (node!=null && (node.getBackwardNode()!=null || node.getForwardNode()!=null)){
+//			return node;
+//		}else{
+//			return findLeftMostLinkedNode(node.getLeft());
+//		}
+		
+		//July 4, 2018
 		if (node!=null && (node.getBackwardNode()!=null || node.getForwardNode()!=null)){
 			return node;
-		}else{
+		}else if (node!=null){
 			return findLeftMostLinkedNode(node.getLeft());
+		}else {
+			return null;
 		}
 		
 	}
@@ -1243,7 +1338,8 @@ public class SegmentTree {
 			 
 				rightMostNode = findRightMostLinkedNode(lowerNode);
 				//Find the right most original node at the level where the hashTable is created at and searchForward(rightMost.getForward())
-				searchForwardLinkedNode(rightMostNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+				if (rightMostNode!=null)
+					searchForwardLinkedNode(rightMostNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
 
 		 }					 		
 			
@@ -1282,7 +1378,8 @@ public class SegmentTree {
 
 				//Get the left most original node at the level where the hashtable is constructed at searchBackward(leftMost.getBackward())				
 				leftMostNode = findLeftMostLinkedNode(higherNode);
-				searchBackwardLinkedNode(leftMostNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+				if (leftMostNode!=null)
+					searchBackwardLinkedNode(leftMostNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
 			}
 				
 	}
@@ -1551,12 +1648,14 @@ public class SegmentTree {
 	}
 	
 	//DEC 14, 2017 starts
+	//ISTF output only 1 interval
+	//Both GUI and command line arguments call this function
 	public static TIntObjectMap<List<Interval>>  findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
 			int presetValue,
 			IndexingLevelDecisionMode mode,
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames,
-			int numberofPercent,
+			float numberofPercent,
 			SearchMethod searchMethod){
 		
 		return FORK_JOIN_POOL.invoke(new FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_ResultingIntervalOnly(
@@ -1568,18 +1667,18 @@ public class SegmentTree {
 				numberofPercent,
 				searchMethod));	
 		
-		
-		
 	}
 	//DEC 14, 2017 ends
 	
 	//Nov 6, 2017 starts
+	//ISTF output n+1 intervals
+	//Both GUI and command line arguments call this function
 	public static TIntObjectMap<List<List<Interval>>>  findCommonIntervals_Construct_Search_FileBased_ChromBased(
 			int presetValue,
 			IndexingLevelDecisionMode mode,
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames,
-			int numberofPercent,
+			float numberofPercent,
 			SearchMethod searchMethod) {
 		
 		
@@ -1611,6 +1710,9 @@ public class SegmentTree {
 	
 	
 	//DEC 15, 2017, starts	
+	//Segment Tree only 1 resulting interval
+	//JOA GUI and joa.jar without command line arguments
+	//joa.jar with command line arguments
 	public static TIntObjectMap<List<Interval>> findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames) {
@@ -1626,6 +1728,8 @@ public class SegmentTree {
 	
 	
 	//October 18, 2017 starts
+	//Segment Tree (n+1) intervals
+	//GUI and command line calls this method
 	public static TIntObjectMap<List<List<Interval>>> findCommonIntervals_Construct_Search_FileBased_ChromBased(
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames) {
@@ -1677,306 +1781,313 @@ public class SegmentTree {
 				
 		if(index2SegmentTreeNodeMap!=null){
 			
-			for(Iterator<Interval> itr=overlappingIntervalsList.iterator();itr.hasNext();){
-				
-				query = itr.next();
-				queryLowEndPoint = query.getLowerEndPoint();
-				queryHighEndPoint = query.getHigherEndPoint();
-												
-				//During search overlappingIntervals will be filled
-				List<Interval> overlappingIntervals  = new ArrayList<Interval>();
-				
-				/*********************************************************/
-				/****************Search starts****************************/
-				/*********************************************************/
-				queryLowHashIndex = queryLowEndPoint / presetValue;
-				queryHighHashIndex = queryHighEndPoint / presetValue;
-				
-				lowNode = index2SegmentTreeNodeMap.get(queryLowHashIndex);
-				
-				//Case1: Node is not null and it is a linked node so we can start search at this node.
-				if (lowNode!=null && isLinked(lowNode)){
-					//cases[0] += 1;
-					searchAtLinkedNode(lowNode,queryLowEndPoint,queryHighEndPoint, overlappingIntervals);				
-				}
-				
-				//Case2: Node is not null but it is an artificial node 
-				//DEC 8 2017 starts
-				else if (lowNode!=null){
-					
-					//cases[1] += 1;
-										
-					if (searchMethod.isUSING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED()) {
-						
-						/***************************************************************************************************************/
-						/**************************************** ISTF STAR starts *****************************************************/
-						/***************************************************************************************************************/
-						if (lastSavedLinkedNode!=null) {
-							
-							if (overlaps(queryLowEndPoint,queryHighEndPoint,lastSavedLinkedNode.getSegment().getLowerEndPoint(),lastSavedLinkedNode.getSegment().getHigherEndPoint())) {
-								
-								searchDownward(queryLowEndPoint, queryHighEndPoint, lastSavedLinkedNode, overlappingIntervals);
-								searchBackwardLinkedNode(lastSavedLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-								searchForwardLinkedNode(lastSavedLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-								
-								
-							}else {
-								
-								if(lastSavedLinkedNode!=null && (queryLowEndPoint>lastSavedLinkedNode.getSegment().getHigherEndPoint())) {									
-									do {
-										lastSavedLinkedNode = lastSavedLinkedNode.getForwardNode();
-									}while (lastSavedLinkedNode!=null && (queryLowEndPoint>lastSavedLinkedNode.getSegment().getHigherEndPoint()));
-									
-								}else if (lastSavedLinkedNode!=null && (queryHighEndPoint<lastSavedLinkedNode.getSegment().getLowerEndPoint())) {
-									
-									do {
-										lastSavedLinkedNode = lastSavedLinkedNode.getBackwardNode();
-									}while (lastSavedLinkedNode!=null && (queryHighEndPoint<lastSavedLinkedNode.getSegment().getLowerEndPoint()));
-								}
-								
-								
-								//Since nodes are consecutive if there is a node not null  it may or may not overlap
-								//We have to check whether it overlaps or not. This is tested and verified								
-								if (lastSavedLinkedNode!=null && overlaps(queryLowEndPoint,queryHighEndPoint,lastSavedLinkedNode.getSegment().getLowerEndPoint(),lastSavedLinkedNode.getSegment().getHigherEndPoint())) {
-									
-									searchDownward(queryLowEndPoint, queryHighEndPoint, lastSavedLinkedNode, overlappingIntervals);									
-									searchBackwardLinkedNode(lastSavedLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-									searchForwardLinkedNode(lastSavedLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);									
+			if (overlappingIntervalsList!=null) {
 
-								}
-							}
-							
-						
-						}
-						//Then find last overlapping linked node
-						else {
-														
-														
-							if (overlaps(queryLowEndPoint,queryHighEndPoint,lowNode.getSegment().getLowerEndPoint(),lowNode.getSegment().getHigherEndPoint())){
-							 
-								 //DEC 10, 2017 starts
-								 //lowNode is the head of the BST.
-								 //searchDownward and get the leftmost linked node for this query interval
-								 
-								 lastSavedLinkedNode = findLeftMostOverlappingLinkedNode(queryLowEndPoint,queryHighEndPoint,lowNode);
-								 searchAtLinkedNode(lastSavedLinkedNode, queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+				for(Iterator<Interval> itr=overlappingIntervalsList.iterator();itr.hasNext();){
+					
+					query = itr.next();
+					queryLowEndPoint = query.getLowerEndPoint();
+					queryHighEndPoint = query.getHigherEndPoint();
 													
-							 }else {
-							
-								rightMostLinkedNode = findRightMostLinkedNode(lowNode);
-								//Find the right most original node at the level where the hashTable is created at and searchForward(rightMost.getForward())
-								searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-								
-								leftMostLinkedNode = findLeftMostLinkedNode(lowNode);
-								searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-							}
-
-							
-						}
-						/***************************************************************************************************************/
-						/**************************************** ISTF STAR ends *******************************************************/
-						/***************************************************************************************************************/
-
-					}else  {
-						
-						/***************************************************************************************************************/
-						/******************************************** ISTF starts ******************************************************/
-						/***************************************************************************************************************/
-						if (overlaps(queryLowEndPoint,queryHighEndPoint,lowNode.getSegment().getLowerEndPoint(),lowNode.getSegment().getHigherEndPoint())){
-						 							
-							 searchDownward(queryLowEndPoint,
-										queryHighEndPoint, 
-										lowNode,
-										overlappingIntervals);	
-							
-						 }
-
-						rightMostLinkedNode = findRightMostLinkedNode(lowNode);
-						//Find the right most original node at the level where the hashTable is created at and searchForward(rightMost.getForward())
-						searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-						
-						leftMostLinkedNode = findLeftMostLinkedNode(lowNode);
-						searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-						/***************************************************************************************************************/
-						/******************************************** ISTF ends ********************************************************/
-						/***************************************************************************************************************/
-
+					//During search overlappingIntervals will be filled
+					List<Interval> overlappingIntervals  = new ArrayList<Interval>();
+					
+					/*********************************************************/
+					/****************Search starts****************************/
+					/*********************************************************/
+					queryLowHashIndex = queryLowEndPoint / presetValue;
+					queryHighHashIndex = queryHighEndPoint / presetValue;
+					
+					lowNode = index2SegmentTreeNodeMap.get(queryLowHashIndex);
+					
+					//Case1: Node is not null and it is a linked node so we can start search at this node.
+					if (lowNode!=null && isLinked(lowNode)){
+						//cases[0] += 1;
+						searchAtLinkedNode(lowNode,queryLowEndPoint,queryHighEndPoint, overlappingIntervals);				
 					}
-									
-
-				 }					 		
-				//DEC 8 2017 ends
-				
-				//or Case3: Node is null
-				else {
 					
-					//cases[2] += 1;
-					
-					//Search at lower node
-					lowerHashIndex = getExistingLowerHashIndex(index2SegmentTreeNodeMap, queryLowHashIndex);
-					lowerNode = index2SegmentTreeNodeMap.get(lowerHashIndex);
-					
-					if (lowerNode != null){
+					//Case2: Node is not null but it is an artificial node 
+					//DEC 8 2017 starts
+					else if (lowNode!=null){
 						
-						//cases[3] += 1;						
-						searchAtLowerNode(lowerNode,queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-						
-					}else {
-						
-						highNode = index2SegmentTreeNodeMap.get(queryHighHashIndex);
-						
-						//Case1 highNode is not null and it is linked
-						if (highNode!=null && isLinked(highNode)){	
-							//cases[4] += 1;
-							searchAtLinkedNode(highNode,queryLowEndPoint,queryHighEndPoint, overlappingIntervals);				
-						}
-						//case2 highNode is not null and it is artificial
-						else if (highNode!=null) {
+						//cases[1] += 1;
+											
+						if (searchMethod.isUSING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED()) {
 							
-							//cases[5] += 1;
-							
-							//ISTF_STAR Requires sorted input files it uses last saved overlapping linked segment tree node
-							if (searchMethod.isUSING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED()) {
+							/***************************************************************************************************************/
+							/**************************************** ISTF STAR starts *****************************************************/
+							/***************************************************************************************************************/
+							if (lastSavedLinkedNode!=null) {
 								
-								/***************************************************************************************************************/
-								/**************************************** ISTF STAR starts *****************************************************/
-								/***************************************************************************************************************/
-								if (lastSavedLinkedNode!=null) {
+								if (overlaps(queryLowEndPoint,queryHighEndPoint,lastSavedLinkedNode.getSegment().getLowerEndPoint(),lastSavedLinkedNode.getSegment().getHigherEndPoint())) {
 									
-									if (overlaps(queryLowEndPoint,queryHighEndPoint,lastSavedLinkedNode.getSegment().getLowerEndPoint(),lastSavedLinkedNode.getSegment().getHigherEndPoint())) {
+									searchDownward(queryLowEndPoint, queryHighEndPoint, lastSavedLinkedNode, overlappingIntervals);
+									searchBackwardLinkedNode(lastSavedLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+									searchForwardLinkedNode(lastSavedLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+									
+									
+								}else {
+									
+									if(lastSavedLinkedNode!=null && (queryLowEndPoint>lastSavedLinkedNode.getSegment().getHigherEndPoint())) {									
+										do {
+											lastSavedLinkedNode = lastSavedLinkedNode.getForwardNode();
+										}while (lastSavedLinkedNode!=null && (queryLowEndPoint>lastSavedLinkedNode.getSegment().getHigherEndPoint()));
 										
-										searchDownward(queryLowEndPoint, queryHighEndPoint, lastSavedLinkedNode, overlappingIntervals);										
-										searchBackwardLinkedNode(lastSavedLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);										
-										searchForwardLinkedNode(lastSavedLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+									}else if (lastSavedLinkedNode!=null && (queryHighEndPoint<lastSavedLinkedNode.getSegment().getLowerEndPoint())) {
 										
-									}else {
-										
-										//Since query intervals are sorted w.r.t. their lowEndPoint
-										//We must always look at the forward node						
-										// IF queryLowEndPoint is less than or equal to lastSavedLinkedNode.high
-										//then lastSavedLinkedNode.low is always less than queryHighEndPoint
-										//no need for overlap check
-										
-										
-										//think about here. Do we need the else part
-										if(lastSavedLinkedNode!=null && (queryLowEndPoint>lastSavedLinkedNode.getSegment().getHigherEndPoint())) {											
-											do {
-												lastSavedLinkedNode = lastSavedLinkedNode.getForwardNode();
-											}while (lastSavedLinkedNode!=null && (queryLowEndPoint>lastSavedLinkedNode.getSegment().getHigherEndPoint()));
-											
-										}else if (lastSavedLinkedNode!=null && (queryHighEndPoint<lastSavedLinkedNode.getSegment().getLowerEndPoint())) {
-											
-											do {
-												lastSavedLinkedNode = lastSavedLinkedNode.getBackwardNode();
-											}while (lastSavedLinkedNode!=null && (queryHighEndPoint<lastSavedLinkedNode.getSegment().getLowerEndPoint()));
-										}
-										
-										//Since nodes are consecutive if there is a node not null  it may or  may not overlap 
-										if (lastSavedLinkedNode!=null && overlaps(queryLowEndPoint,queryHighEndPoint,lastSavedLinkedNode.getSegment().getLowerEndPoint(),lastSavedLinkedNode.getSegment().getHigherEndPoint())) {
-											
-											searchDownward(queryLowEndPoint, queryHighEndPoint, lastSavedLinkedNode, overlappingIntervals);											
-											searchBackwardLinkedNode(lastSavedLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-											searchForwardLinkedNode(lastSavedLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-																						
-										}
+										do {
+											lastSavedLinkedNode = lastSavedLinkedNode.getBackwardNode();
+										}while (lastSavedLinkedNode!=null && (queryHighEndPoint<lastSavedLinkedNode.getSegment().getLowerEndPoint()));
 									}
 									
-								
+									
+									//Since nodes are consecutive if there is a node not null  it may or may not overlap
+									//We have to check whether it overlaps or not. This is tested and verified								
+									if (lastSavedLinkedNode!=null && overlaps(queryLowEndPoint,queryHighEndPoint,lastSavedLinkedNode.getSegment().getLowerEndPoint(),lastSavedLinkedNode.getSegment().getHigherEndPoint())) {
+										
+										searchDownward(queryLowEndPoint, queryHighEndPoint, lastSavedLinkedNode, overlappingIntervals);									
+										searchBackwardLinkedNode(lastSavedLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+										searchForwardLinkedNode(lastSavedLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);									
+
+									}
 								}
-								//Then find last overlapping linked node
-								else {
-									
-									
-									if (overlaps(queryLowEndPoint,queryHighEndPoint,highNode.getSegment().getLowerEndPoint(),highNode.getSegment().getHigherEndPoint())){
-									 
-										 //DEC 10, 2017 starts
-										 //lowNode is the head of the BST.
-										 //searchDownward and get the leftmost linked node for this query interval
-										 
-										 //As long as you search at linked node finding left most overlapping linked node and right most overlapping linked node does not  matter.
-										 lastSavedLinkedNode = findRightMostOverlappingLinkedNode(queryLowEndPoint,queryHighEndPoint,highNode);
-										 searchAtLinkedNode(lastSavedLinkedNode, queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-															
-									 } else {
-
-											rightMostLinkedNode = findRightMostLinkedNode(highNode);
-											//Find the right most original node at the level where the hashTable is created at and searchForward(rightMost.getForward())
-											searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-											
-											leftMostLinkedNode = findLeftMostLinkedNode(highNode);
-											searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-
-									 }									
-									
-								}
-								/***************************************************************************************************************/
-								/**************************************** ISTF STAR ends *******************************************************/
-								/***************************************************************************************************************/
-
 								
+							
 							}
-							//ISTF
+							//Then find last overlapping linked node
 							else {
-
-								/***************************************************************************************************************/
-								/******************************************* ISTF starts *******************************************************/
-								/***************************************************************************************************************/
-								if (overlaps(queryLowEndPoint,queryHighEndPoint,highNode.getSegment().getLowerEndPoint(),highNode.getSegment().getHigherEndPoint())){
-									 	
-									 searchDownward(queryLowEndPoint,
-												queryHighEndPoint, 
-												highNode,
-												overlappingIntervals);	
+															
+															
+								if (overlaps(queryLowEndPoint,queryHighEndPoint,lowNode.getSegment().getLowerEndPoint(),lowNode.getSegment().getHigherEndPoint())){
+								 
+									 //DEC 10, 2017 starts
+									 //lowNode is the head of the BST.
+									 //searchDownward and get the leftmost linked node for this query interval
+									 
+									 lastSavedLinkedNode = findLeftMostOverlappingLinkedNode(queryLowEndPoint,queryHighEndPoint,lowNode);
+									 searchAtLinkedNode(lastSavedLinkedNode, queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+														
+								 }else {
+								
+									rightMostLinkedNode = findRightMostLinkedNode(lowNode);
+									//Find the right most original node at the level where the hashTable is created at and searchForward(rightMost.getForward())
+									if (rightMostLinkedNode!=null)
+										searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
 									
-								 }
-							 
-								rightMostLinkedNode = findRightMostLinkedNode(highNode);
-								//Find the right most original node at the level where the hashTable is created at and searchForward(rightMost.getForward())
-								searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+									leftMostLinkedNode = findLeftMostLinkedNode(lowNode);
+									if (leftMostLinkedNode!=null)
+										searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+								}
 
 								
-								leftMostLinkedNode = findLeftMostLinkedNode(highNode);
-								searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
-								/***************************************************************************************************************/
-								/********************************************* ISTF ends *******************************************************/
-								/***************************************************************************************************************/
-
-							}															
-							
-						}
-						//case3 highNode is null
-						else   {
-							
-							//cases[6] += 1;
-						
-							//Search at higher node
-							higherHashIndex = getExistingHigherHashIndex(index2SegmentTreeNodeMap, queryHighHashIndex,presetValue);
-							higherNode = index2SegmentTreeNodeMap.get(higherHashIndex);
-							
-							if(higherNode!=null){
-								searchAtHigherNode(higherNode,queryLowEndPoint, queryHighEndPoint, overlappingIntervals);		
 							}
+							/***************************************************************************************************************/
+							/**************************************** ISTF STAR ends *******************************************************/
+							/***************************************************************************************************************/
+
+						}else  {
+							
+							/***************************************************************************************************************/
+							/******************************************** ISTF starts ******************************************************/
+							/***************************************************************************************************************/
+							if (overlaps(queryLowEndPoint,queryHighEndPoint,lowNode.getSegment().getLowerEndPoint(),lowNode.getSegment().getHigherEndPoint())){
+							 							
+								 searchDownward(queryLowEndPoint,
+											queryHighEndPoint, 
+											lowNode,
+											overlappingIntervals);	
+								
+							 }
+
+							rightMostLinkedNode = findRightMostLinkedNode(lowNode);
+							//Find the right most original node at the level where the hashTable is created at and searchForward(rightMost.getForward())
+							searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+							
+							leftMostLinkedNode = findLeftMostLinkedNode(lowNode);
+							searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+							/***************************************************************************************************************/
+							/******************************************** ISTF ends ********************************************************/
+							/***************************************************************************************************************/
+
+						}
+										
+
+					 }					 		
+					//DEC 8 2017 ends
+					
+					//or Case3: Node is null
+					else {
+						
+						//cases[2] += 1;
+						
+						//Search at lower node
+						lowerHashIndex = getExistingLowerHashIndex(index2SegmentTreeNodeMap, queryLowHashIndex);
+						lowerNode = index2SegmentTreeNodeMap.get(lowerHashIndex);
+						
+						if (lowerNode != null){
+							
+							//cases[3] += 1;						
+							searchAtLowerNode(lowerNode,queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+							
+						}else {
+							
+							highNode = index2SegmentTreeNodeMap.get(queryHighHashIndex);
+							
+							//Case1 highNode is not null and it is linked
+							if (highNode!=null && isLinked(highNode)){	
+								//cases[4] += 1;
+								searchAtLinkedNode(highNode,queryLowEndPoint,queryHighEndPoint, overlappingIntervals);				
+							}
+							//case2 highNode is not null and it is artificial
+							else if (highNode!=null) {
+								
+								//cases[5] += 1;
+								
+								//ISTF_STAR Requires sorted input files it uses last saved overlapping linked segment tree node
+								if (searchMethod.isUSING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED()) {
+									
+									/***************************************************************************************************************/
+									/**************************************** ISTF STAR starts *****************************************************/
+									/***************************************************************************************************************/
+									if (lastSavedLinkedNode!=null) {
+										
+										if (overlaps(queryLowEndPoint,queryHighEndPoint,lastSavedLinkedNode.getSegment().getLowerEndPoint(),lastSavedLinkedNode.getSegment().getHigherEndPoint())) {
+											
+											searchDownward(queryLowEndPoint, queryHighEndPoint, lastSavedLinkedNode, overlappingIntervals);										
+											searchBackwardLinkedNode(lastSavedLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);										
+											searchForwardLinkedNode(lastSavedLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+											
+										}else {
+											
+											//Since query intervals are sorted w.r.t. their lowEndPoint
+											//We must always look at the forward node						
+											// IF queryLowEndPoint is less than or equal to lastSavedLinkedNode.high
+											//then lastSavedLinkedNode.low is always less than queryHighEndPoint
+											//no need for overlap check
+											
+											
+											//think about here. Do we need the else part
+											if(lastSavedLinkedNode!=null && (queryLowEndPoint>lastSavedLinkedNode.getSegment().getHigherEndPoint())) {											
+												do {
+													lastSavedLinkedNode = lastSavedLinkedNode.getForwardNode();
+												}while (lastSavedLinkedNode!=null && (queryLowEndPoint>lastSavedLinkedNode.getSegment().getHigherEndPoint()));
+												
+											}else if (lastSavedLinkedNode!=null && (queryHighEndPoint<lastSavedLinkedNode.getSegment().getLowerEndPoint())) {
+												
+												do {
+													lastSavedLinkedNode = lastSavedLinkedNode.getBackwardNode();
+												}while (lastSavedLinkedNode!=null && (queryHighEndPoint<lastSavedLinkedNode.getSegment().getLowerEndPoint()));
+											}
+											
+											//Since nodes are consecutive if there is a node not null  it may or  may not overlap 
+											if (lastSavedLinkedNode!=null && overlaps(queryLowEndPoint,queryHighEndPoint,lastSavedLinkedNode.getSegment().getLowerEndPoint(),lastSavedLinkedNode.getSegment().getHigherEndPoint())) {
+												
+												searchDownward(queryLowEndPoint, queryHighEndPoint, lastSavedLinkedNode, overlappingIntervals);											
+												searchBackwardLinkedNode(lastSavedLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+												searchForwardLinkedNode(lastSavedLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+																							
+											}
+										}
+										
+									
+									}
+									//Then find last overlapping linked node
+									else {
+										
+										
+										if (overlaps(queryLowEndPoint,queryHighEndPoint,highNode.getSegment().getLowerEndPoint(),highNode.getSegment().getHigherEndPoint())){
+										 
+											 //DEC 10, 2017 starts
+											 //lowNode is the head of the BST.
+											 //searchDownward and get the leftmost linked node for this query interval
+											 
+											 //As long as you search at linked node finding left most overlapping linked node and right most overlapping linked node does not  matter.
+											 lastSavedLinkedNode = findRightMostOverlappingLinkedNode(queryLowEndPoint,queryHighEndPoint,highNode);
+											 searchAtLinkedNode(lastSavedLinkedNode, queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+																
+										 } else {
+
+												rightMostLinkedNode = findRightMostLinkedNode(highNode);
+												//Find the right most original node at the level where the hashTable is created at and searchForward(rightMost.getForward())
+												searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+												
+												leftMostLinkedNode = findLeftMostLinkedNode(highNode);
+												searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+
+										 }									
+										
+									}
+									/***************************************************************************************************************/
+									/**************************************** ISTF STAR ends *******************************************************/
+									/***************************************************************************************************************/
+
+									
+								}
+								//ISTF
+								else {
+
+									/***************************************************************************************************************/
+									/******************************************* ISTF starts *******************************************************/
+									/***************************************************************************************************************/
+									if (overlaps(queryLowEndPoint,queryHighEndPoint,highNode.getSegment().getLowerEndPoint(),highNode.getSegment().getHigherEndPoint())){
+										 	
+										 searchDownward(queryLowEndPoint,
+													queryHighEndPoint, 
+													highNode,
+													overlappingIntervals);	
+										
+									 }
+								 
+									rightMostLinkedNode = findRightMostLinkedNode(highNode);
+									//Find the right most original node at the level where the hashTable is created at and searchForward(rightMost.getForward())
+									searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+
+									
+									leftMostLinkedNode = findLeftMostLinkedNode(highNode);
+									searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+									/***************************************************************************************************************/
+									/********************************************* ISTF ends *******************************************************/
+									/***************************************************************************************************************/
+
+								}															
+								
+							}
+							//case3 highNode is null
+							else   {
+								
+								//cases[6] += 1;
+							
+								//Search at higher node
+								higherHashIndex = getExistingHigherHashIndex(index2SegmentTreeNodeMap, queryHighHashIndex,presetValue);
+								higherNode = index2SegmentTreeNodeMap.get(higherHashIndex);
+								
+								if(higherNode!=null){
+									searchAtHigherNode(higherNode,queryLowEndPoint, queryHighEndPoint, overlappingIntervals);		
+								}
+							}
+							
+													
 						}
 						
-												
-					}
-					
-				}							
-				/*********************************************************/
-				/****************Search ends******************************/
-				/*********************************************************/
+					}							
+					/*********************************************************/
+					/****************Search ends******************************/
+					/*********************************************************/
 
-				/*********************************************************/
-				/****************Examine overlappingIntervals starts******/
-				/*********************************************************/
-				//We have searched for the query and found the overlappingIntervals as overlapping intervals with the query
-				//Now update updatedOverlappingIntervalsList
-				examineOverlappingIntervals(query,overlappingIntervals,updatedOverlappingIntervalsList);				
-				/*********************************************************/
-				/****************Examine overlappingIntervals ends********/
-				/*********************************************************/
-												
-			}//End of for each query interval
+					/*********************************************************/
+					/****************Examine overlappingIntervals starts******/
+					/*********************************************************/
+					//We have searched for the query and found the overlappingIntervals as overlapping intervals with the query
+					//Now update updatedOverlappingIntervalsList
+					examineOverlappingIntervals(query,overlappingIntervals,updatedOverlappingIntervalsList);				
+					/*********************************************************/
+					/****************Examine overlappingIntervals ends********/
+					/*********************************************************/
+													
+				}//End of for each query interval
+
+			}//End of if overlappingIntervalsList is not null
+			
 							
 		}//End of if index2SegmentTreeNodeMap is not null
 			
@@ -2126,10 +2237,12 @@ public class SegmentTree {
 							 } else {
 								 
 									rightMostLinkedNode = findRightMostLinkedNode(lowNode);
-									searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
+									if (rightMostLinkedNode!=null)
+										searchForwardLinkedNode(rightMostLinkedNode.getForwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);
 
 									leftMostLinkedNode = findLeftMostLinkedNode(lowNode);
-									searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);								 
+									if (leftMostLinkedNode!=null)
+										searchBackwardLinkedNode(leftMostLinkedNode.getBackwardNode(), queryLowEndPoint, queryHighEndPoint, overlappingIntervals);								 
 							 }							
 							
 						}
@@ -2501,8 +2614,7 @@ public class SegmentTree {
 				}while ((strLine = inputBufferedReader.readLine()) != null);
 				
 			}
-			
-			
+						
 			strLine = null;
 			
 			//Close
@@ -2625,14 +2737,13 @@ public class SegmentTree {
 	//October 7,2017 ends
 	
 	//31 January 2017
-	public static void fill(
+	public static void constructBSTfromList(
 			TIntObjectMap<SegmentTreeNode> hashIndex2SegmentTreeNodeMap,
 			TIntObjectMap<List<SegmentTreeNode>> hashIndex2SegmentTreeNodeListMap){
 		
 		List<SegmentTreeNode> segmentTreeNodes = null;
 		int index;
 		SegmentTreeNode root = null;
-		
 		
 		for(TIntObjectIterator<List<SegmentTreeNode>>  itr=hashIndex2SegmentTreeNodeListMap.iterator();itr.hasNext();){
 			itr.advance();
@@ -2644,7 +2755,15 @@ public class SegmentTree {
 				hashIndex2SegmentTreeNodeMap.put(index, segmentTreeNodes.get(0));
 			}else if (segmentTreeNodes.size()>1){
 			
-				root = constructBSTFromElementaryIntervals(segmentTreeNodes.toArray(new SegmentTreeNode[segmentTreeNodes.size()] ));
+				//old code
+//				root = constructBSTFromElementaryIntervals(segmentTreeNodes.toArray(new SegmentTreeNode[segmentTreeNodes.size()] ));
+				
+				root = constructBSTFromElementaryIntervalsWithLevel(segmentTreeNodes);
+				
+//				//debug starts
+//				System.out.println("Constructed BST from nodes at cutoff level (This BST's root level): " + root.getLevel());
+//				//debug ends
+				
 				hashIndex2SegmentTreeNodeMap.put(index, root);
 				
 			}else{
@@ -3044,7 +3163,10 @@ public class SegmentTree {
 		//Convention
 		//First level is always numbered with one
 		//root has level of 1
-		int currentLevel = 1;	
+		
+		//June 2, 2018
+		//int currentLevel = 1;	
+		int currentLevel = node.getLevel();
 		
 		
 		if( node!=null){
@@ -3062,7 +3184,10 @@ public class SegmentTree {
 			//Attach associatedIntervals at this level to its children
 			//Will there be any interval that will not be carried to the nodes at indexing level (at which we are constructing the hash table)?
 			//Yes because there are intervals attached to nodes at levels lower than indexing levels and their left and right children are null.
-			if (currentLevel < hashTableWillBeConstructedAtThisLevel){
+			
+			//June 2, 2018
+//			if (currentLevel < hashTableWillBeConstructedAtThisLevel){
+			if (currentLevel > hashTableWillBeConstructedAtThisLevel){
 				
 				//If currentNode has no canoncical subset it means that there are no intervals
 				//Then no need to keep this node in our hashIndex2SegmentTreeNodeListMap
@@ -3138,7 +3263,10 @@ public class SegmentTree {
 			
 			
 			//We are at the levels below the indexing level so no need to traverse these levels
-			else if (currentLevel > hashTableWillBeConstructedAtThisLevel){	
+			
+			//June 2, 2018
+			//else if (currentLevel > hashTableWillBeConstructedAtThisLevel){	
+			else if (currentLevel < hashTableWillBeConstructedAtThisLevel){	
 								
 				//Add the segments that could not be represented since their children are null
 				//Segments at lower levels are greater than segments at higher level
@@ -3180,20 +3308,37 @@ public class SegmentTree {
 			
 			if( currentNode.getLeft()!= null){
 				toBeAddedNode = currentNode.getLeft();
-				queue.add(new SegmentTreeNode(toBeAddedNode.getLeft(),toBeAddedNode.getRight(),toBeAddedNode.getSegment(),toBeAddedNode.getCanonicalSubset(),currentLevel+1));
+				//June 2, 2018
+				//queue.add(new SegmentTreeNode(toBeAddedNode.getLeft(),toBeAddedNode.getRight(),toBeAddedNode.getSegment(),toBeAddedNode.getCanonicalSubset(),currentLevel+1));
+				queue.add(new SegmentTreeNode(toBeAddedNode.getLeft(),toBeAddedNode.getRight(),toBeAddedNode.getSegment(),toBeAddedNode.getCanonicalSubset(),currentLevel-1));
 			}
 
 			if( currentNode.getRight()!= null){
 				toBeAddedNode = currentNode.getRight();
-				queue.add(new SegmentTreeNode(toBeAddedNode.getLeft(),toBeAddedNode.getRight(),toBeAddedNode.getSegment(),toBeAddedNode.getCanonicalSubset(),currentLevel+1));
+				//June 2, 2018
+				//queue.add(new SegmentTreeNode(toBeAddedNode.getLeft(),toBeAddedNode.getRight(),toBeAddedNode.getSegment(),toBeAddedNode.getCanonicalSubset(),currentLevel+1));
+				queue.add(new SegmentTreeNode(toBeAddedNode.getLeft(),toBeAddedNode.getRight(),toBeAddedNode.getSegment(),toBeAddedNode.getCanonicalSubset(),currentLevel-1));
 			}
 				
 			
 		}//End of while
 		
 		
+//		//debug starts		
+//		for (TIntObjectIterator<List<SegmentTreeNode>> itr =hashIndex2SegmentTreeNodeListMap.iterator();itr.hasNext();) {
+//			
+//			itr.advance();
+//			List<SegmentTreeNode>  segmentTreeNodeList = itr.value();
+//			System.out.println("itr.key(): " + itr.key() +  " itr.value(): " + itr.value());
+//			
+//			for (SegmentTreeNode nodeInTheList:segmentTreeNodeList){
+//				System.out.println("node.low: " + nodeInTheList.getSegment().getLowerEndPoint() + " node.high: " + nodeInTheList.getSegment().getHigherEndPoint() + " node.level: " + nodeInTheList.getLevel()) ;
+//				
+//			}
+//									
+//		}
+//		//debug ends
 		
-
 	}
 	
 	
@@ -3306,6 +3451,49 @@ public class SegmentTree {
 		levelFeatures.setNumberofIntervalsAtThisLevel(numberofIntervalsAtThisLevel);
 		levelFeatures.setNumberofIntervalsUpToThisLevel(numberofTotalIntervals);
 		segmentTreeLevelFeatureList.add(levelFeatures);		
+		
+	}
+	
+	//June 4, 2018
+	//For JOA BMC Bioinformatics
+	public static void breadthFirstTraversal(SegmentTreeNode node) {
+		
+		Queue<SegmentTreeNode> queue = new LinkedList<SegmentTreeNode>();
+		
+		SegmentTreeNode currentNode = null;
+		int currentLevel;
+		
+		if( node!=null){
+			queue.clear();
+		    queue.add(node);
+		}
+		
+		while(!queue.isEmpty()){
+			
+			currentNode = queue.remove();				
+			currentLevel = currentNode.getLevel();
+			
+			try {
+				
+				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Users\\burcak\\git\\JOA\\JOA_log.txt", true));
+				bufferedWriter.write("node.low: " + currentNode.getSegment().getLowerEndPoint() + "\t" + "node.high: " + currentNode.getSegment().getHigherEndPoint() + "\t" + "node.level: " + currentLevel + System.getProperty("line.separator"));
+				bufferedWriter.close();
+				
+			} catch (IOException e) {
+				// TODO: handle exception
+			}
+	
+			
+			if (currentNode.getLeft()!=null) {
+				queue.add(currentNode.getLeft());
+			}
+			
+			if (currentNode.getRight()!=null) {
+				queue.add(currentNode.getRight());
+			}
+		
+		}//End of while
+	
 		
 	}
 	
@@ -3507,7 +3695,7 @@ public class SegmentTree {
 		root = constructBSTFromElementaryIntervals(elementarySegmentTreeNodes);
 
 		//Step3 Store original intervals in segment tree
-		storeIntervals(root,intervals);
+		storeUnsortedIntervals(root,intervals);
 		
 		//for less memory usage
 		intervals = null;
@@ -3519,6 +3707,7 @@ public class SegmentTree {
 
 	
 	//26 April 2017
+	//June 4, 2018, intervals are not sorted
 	public static SegmentTreeNode constructSegmentTree(int[] sortedEndPoints,  Interval[] intervals,TIntIntMap levelNumber2NumberofIntervalsMap){
 		
 		SegmentTreeNode root = null;
@@ -3532,7 +3721,7 @@ public class SegmentTree {
 		root = constructBSTFromElementaryIntervalsWithLevel(elementarySegmentTreeNodes);
 		
 		//Step3 Store original intervals in segment tree
-		storeIntervals(root,intervals,levelNumber2NumberofIntervalsMap);		
+		storeUnsortedIntervals(root,intervals,levelNumber2NumberofIntervalsMap);		
 
 		return root;
 		
@@ -3544,18 +3733,19 @@ public class SegmentTree {
 	//We go down, increase the level and check whether total number of intervals up to that level and including the level exceeds the onePercentofNumberofTotalIntervals
 	//We return that level as indexing (cutoff) level.
 	//What is the level of leaf nodes? leaf nodes level is 1
-	public static int calculateIndexingLevel(TIntIntMap levelNumber2NumberofIntervalsMap,int numberofPercent){
+	public static int calculateIndexingLevelFromLeafLevelStartingAt1(int chrNumber,TIntIntMap levelNumber2NumberofIntervalsMap,float numberofPercent){
 		
 		//DEC 9, 2017, Let's set it to leaf node level which is one.
 		int indexingLevel=1;
 		
 		int numberofTotalIntervals = 0;
-		
-		int highestLevel = levelNumber2NumberofIntervalsMap.size();	
-		
+				
 		int numberofPercentofNumberofTotalIntervals = 0;
 		
 		int numberofTotalIntervalsUptoThisLevel = 0;
+		
+		//For debugging
+		//int formerNumberofTotalIntervalsUptoThisLevel = 0;
 		
 		//Calculate number of total Intervals
 		for(TIntIntIterator itr=levelNumber2NumberofIntervalsMap.iterator();itr.hasNext();){			
@@ -3564,21 +3754,86 @@ public class SegmentTree {
 			
 		}//End of for
 		
-		numberofPercentofNumberofTotalIntervals = (numberofPercent*numberofTotalIntervals)/100;
+		numberofPercentofNumberofTotalIntervals = (int) ((numberofPercent*numberofTotalIntervals)/100);
 		
 		//Find the level
 		//Question: Based on number of intervals at that level? or
-		//Question: Based on all the total number of intervals up to that level (not including that level)?	
-		for(int level=highestLevel; level>0; level--){
+		//Question: Based on all the total number of intervals up to that level (not including that level)?
+		
+		for(TIntIntIterator itr =levelNumber2NumberofIntervalsMap.iterator();itr.hasNext();) {
+			itr.advance();
 			
-			numberofTotalIntervalsUptoThisLevel += levelNumber2NumberofIntervalsMap.get(level);
+			int level = itr.key();
+			int numberofIntervalsAtThisLevel = itr.value();
+			
+			//for debugging
+			//formerNumberofTotalIntervalsUptoThisLevel = numberofTotalIntervalsUptoThisLevel;
+			
+			numberofTotalIntervalsUptoThisLevel += numberofIntervalsAtThisLevel;				
+			
+//			//debug starts			
+//			if (chrNumber==1) {
+//				
+//				try {
+//					BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Users\\burcak\\git\\JOA\\JOA_log.txt", true));
+//					bufferedWriter.write("chrNumber: " + chrNumber + " numberofPercent: " + numberofPercent + " level: " + level + " numberofTotalIntervalsUptoThisLevel: " + numberofTotalIntervalsUptoThisLevel + " numberofPercentofNumberofTotalIntervals: " + numberofPercentofNumberofTotalIntervals + System.getProperty("line.separator"));				
+//					bufferedWriter.close();
+//				} catch (IOException e2) {
+//					// TODO: handle exception
+//				}	
+//				
+//			}
+//			//debug ends
 			
 			if (numberofTotalIntervalsUptoThisLevel > numberofPercentofNumberofTotalIntervals){
 				indexingLevel = level;
+				
+//				//June 4, 2018
+//				//debug starts			
+//				//if (chrNumber==1) {
+//					
+//					try {
+//						BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Users\\burcak\\git\\JOA\\JOA_log.txt", true));
+//						bufferedWriter.write("chrNumber\t" + chrNumber + "\tnumberofPercent\t" + numberofPercent + "\tindexingLevel\t" + indexingLevel + "\tformerNumberofTotalIntervalsUptoThisLevel\t" + formerNumberofTotalIntervalsUptoThisLevel + System.getProperty("line.separator"));				
+//						bufferedWriter.close();
+//					} catch (IOException e2) {
+//						// TODO: handle exception
+//					}	
+//					
+//				//}
+//				//debug ends
+				
 				break;
 			}
 			
+			
+			
 		}//End of for
+		
+//		for(int level=highestLevel; level>0; level--){
+//			
+//			numberofTotalIntervalsUptoThisLevel += levelNumber2NumberofIntervalsMap.get(level);						
+//			
+//			//debug starts			
+//			if (chrNumber==1) {
+//				
+//				try {
+//					BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Users\\burcak\\git\\JOA\\JOA_log.txt", true));
+//					bufferedWriter.write("chrNumber: " + chrNumber + " numberofPercent: " + numberofPercent + " level: " + level + " numberofTotalIntervalsUptoThisLevel: " + numberofTotalIntervalsUptoThisLevel + " numberofPercentofNumberofTotalIntervals: " + numberofPercentofNumberofTotalIntervals + System.getProperty("line.separator"));				
+//					bufferedWriter.close();
+//				} catch (IOException e2) {
+//					// TODO: handle exception
+//				}	
+//				
+//			}
+//			//debug ends
+//			
+//			if (numberofTotalIntervalsUptoThisLevel > numberofPercentofNumberofTotalIntervals){
+//				indexingLevel = level;
+//				break;
+//			}
+//			
+//		}//End of for
 		
 		
 		return indexingLevel;
@@ -3586,30 +3841,30 @@ public class SegmentTree {
 	
 	
 	
-	public static SegmentTreeNode constructSegmentTree(List<Integer> endPointsSorted, List<Interval> intervals){
-		
-		SegmentTreeNode root = null;
-		List<SegmentTreeNode> elementarySegmentTreeNodes = new ArrayList<SegmentTreeNode>();
-		
-		//Create elementary Segment Nodes
-		//In other words, fill leaf nodes
-		//Think about first dummy node. Do we really need it? I guess yes.
-		//In case of one interval only, we need at least two intervals at the leaf level to construct BST
-		createElementaryIntervals(endPointsSorted,elementarySegmentTreeNodes);
-				
-		//Now construct BST segment tree from elementaryIntervals
-		root = constructBSTFromElementaryIntervals(elementarySegmentTreeNodes);
-		
-		//Think about segments in the segment tree.
-		// They should it like  [10,200] [201,260]
-		//Find canonical subset of each node
-		storeIntervals(root,intervals);
-
-		
-		return root;
-		
-		
-	}
+//	public static SegmentTreeNode constructSegmentTree(List<Integer> endPointsSorted, List<Interval> intervals){
+//		
+//		SegmentTreeNode root = null;
+//		List<SegmentTreeNode> elementarySegmentTreeNodes = new ArrayList<SegmentTreeNode>();
+//		
+//		//Create elementary Segment Nodes
+//		//In other words, fill leaf nodes
+//		//Think about first dummy node. Do we really need it? I guess yes.
+//		//In case of one interval only, we need at least two intervals at the leaf level to construct BST
+//		createElementaryIntervals(endPointsSorted,elementarySegmentTreeNodes);
+//				
+//		//Now construct BST segment tree from elementaryIntervals
+//		root = constructBSTFromElementaryIntervals(elementarySegmentTreeNodes);
+//		
+//		//Think about segments in the segment tree.
+//		// They should it like  [10,200] [201,260]
+//		//Find canonical subset of each node
+//		storeIntervals(root,intervals);
+//
+//		
+//		return root;
+//		
+//		
+//	}
 	
 	
 	

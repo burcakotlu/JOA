@@ -107,7 +107,7 @@ public class JointOverlapAnalysis {
 			IndexingLevelDecisionMode mode,
 			int presetValue,
 			String intervalSetInputFileName,
-			int numberofPercent){
+			float numberofPercent){
 		
 		
 		TIntObjectMap<TIntArrayList> chrNumber2UnSortedEndPoints = new TIntObjectHashMap<TIntArrayList>();
@@ -121,7 +121,7 @@ public class JointOverlapAnalysis {
 		/********************************************************************/
 		/*******************Step1 Fill End Points ends***********************/
 		/********************************************************************/
-				
+						
 
 		/********************************************************************/
 		/*************Step2 Sort End Points in ascending order starts********/
@@ -442,16 +442,14 @@ public class JointOverlapAnalysis {
 		SegmentTree.shutdownForkJoinPool();		
 		
 		writeToAFile(chrNumber2ResultingIntervalListMap, outputFile);
-		chrNumber2ResultingIntervalListMap= null;
-	
-				
+		chrNumber2ResultingIntervalListMap= null;					
 	}	
 	
 	public static void constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest_ResultingIntervalOnly_GUI(
 			int presetValue,
 			IndexingLevelDecisionMode mode,
 			String[] intervalSetsFileNames,
-			int numberofPercent,
+			float numberofPercent,
 			SearchMethod searchMethod,
 			String outputFile) throws IOException {
 				
@@ -470,7 +468,6 @@ public class JointOverlapAnalysis {
 		writeToAFile(chrNumber2ResultingIntervalListMap, outputFile);
 		chrNumber2ResultingIntervalListMap= null;
 						
-		
 	}	
 	
 	public static void constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_GUI(
@@ -501,7 +498,7 @@ public class JointOverlapAnalysis {
 			int presetValue,
 			IndexingLevelDecisionMode mode,
 			String[] intervalSetsFileNames,
-			int numberofPercent,
+			float numberofPercent,
 			SearchMethod searchMethod,
 			String outputFile) throws IOException {	
 		
@@ -527,13 +524,13 @@ public class JointOverlapAnalysis {
 		/***********************************************************************************************************/
 				
 	}	
-
 	/*****************************************************************************/
 	/******************** FOR JOA GUI ENDS ***************************************/
 	/*****************************************************************************/
 	
 	
 	//DEC 15, 2017 starts
+	//JOA command line parameters
 	public static void constructParallel_searchParallel_FileBased_ChromBased_SegmentTree_ResultingIntervalOnly(
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames) throws IOException {
@@ -541,10 +538,12 @@ public class JointOverlapAnalysis {
 		//Overlapping Intervals found by Indexed Segment Tree Forest
 		TIntObjectMap<List<Interval>> chrNumber2ResultingIntervalListMap = null;
 				
-		SegmentTree.createForkJoinPool();		
+		SegmentTree.createForkJoinPool();
+		
 		chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
 				numberofIntervalSetInputFiles,
-				intervalSetsFileNames);				
+				intervalSetsFileNames);
+
 		SegmentTree.shutdownForkJoinPool();		
 
 		writeToStdOut(chrNumber2ResultingIntervalListMap);		
@@ -585,25 +584,53 @@ public class JointOverlapAnalysis {
 			IndexingLevelDecisionMode mode,
 			int numberofIntervalSetInputFiles,
 			String[] intervalSetsFileNames,
-			int numberofPercent,
+			float numberofPercent,
 			SearchMethod searchMethod) throws IOException {
 				
 		//Overlapping Intervals found by Indexed Segment Tree Forest
 		TIntObjectMap<List<Interval>> chrNumber2ResultingIntervalListMap = null;
 						
 		SegmentTree.createForkJoinPool();		
+
 		chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
-					presetValue,
-					mode,
-					numberofIntervalSetInputFiles,
-					intervalSetsFileNames,
-					numberofPercent,
-					searchMethod);
+				presetValue,
+				mode,
+				numberofIntervalSetInputFiles,
+				intervalSetsFileNames,
+				numberofPercent,
+				searchMethod);
+
+		
+		//debug starts July 7, 2018
+		//Debug starts
+//		for (int i=0; i<50 ; i++ ) {
+						
+//			//Later just have this
+//			chrNumber2ResultingIntervalListMap = SegmentTree.findCommonIntervals_Construct_Search_FileBased_ChromBased_ResultingIntervalOnly(
+//					presetValue,
+//					mode,
+//					numberofIntervalSetInputFiles,
+//					intervalSetsFileNames,
+//					numberofPercent,
+//					searchMethod);
+			
+//			//debug starts			
+//			try {
+//				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("/home/burcak/JOA_BMC_Bioinformatics/JOA_ST_versus_ISTF_Runtime_Comparisons/JOA_ST_versus_ISTF_6M_9M_read_construct_search_runtime.txt", true));
+//				bufferedWriter.write("ISTF\t" + "numberofPercent:" + numberofPercent + "\t*\t*\t*" + System.getProperty("line.separator"));		
+//				bufferedWriter.close();
+//			} catch (IOException e2) {
+//				e2.printStackTrace();
+//			}
+//			//debug ends
+			
+//		}//End of for
+//		//debug ends July 7, 2018
+				
 		SegmentTree.shutdownForkJoinPool();
 		
 		writeToStdOut(chrNumber2ResultingIntervalListMap);
-		chrNumber2ResultingIntervalListMap= null;
-			
+		chrNumber2ResultingIntervalListMap= null;			
 		
 	}	
 	//DEC 14, 2017 ends
@@ -670,7 +697,7 @@ public class JointOverlapAnalysis {
     int preset=1000000;
     
     @Parameter(names={"--percentage", "-pe"})
-    int percentage=1;
+    float percentage=0.5f;
     
 //    @Parameter(names={"--numofRepeats", "-r"})
 //    int numberofRepetitions=1;
@@ -757,29 +784,30 @@ public class JointOverlapAnalysis {
 					
 					switch(treeType) {
 					
-						case INDEXED_SEGMENT_TREE_FOREST:
-							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
-								joa.preset,
-								IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
-								//joa.numberofRepetitions,
-								joa.filenames.size(),
-								filesArray,
-								joa.percentage,
-								SearchMethod.NOT_SET);
-
-							break;
-						
-						case INDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE:
-							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
-									joa.preset,
-									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
-									//joa.numberofRepetitions,
-									joa.filenames.size(),
-									filesArray,
-									joa.percentage,
-									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED);
-			
-							break;
+					//TODO make joa.percentage float
+//						case INDEXED_SEGMENT_TREE_FOREST:
+//							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
+//								joa.preset,
+//								IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+//								//joa.numberofRepetitions,
+//								joa.filenames.size(),
+//								filesArray,
+//								joa.percentage,
+//								SearchMethod.NOT_SET);
+//
+//							break;
+//						
+//						case INDEXED_SEGMENT_TREE_FOREST_USING_LAST_OVERLAPPING_LINKED_NODE:
+//							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_IndexedSegmentTreeForest(
+//									joa.preset,
+//									IndexingLevelDecisionMode.DURING_SEGMENT_TREE_CONSTRUCTION,
+//									//joa.numberofRepetitions,
+//									joa.filenames.size(),
+//									filesArray,
+//									joa.percentage,
+//									SearchMethod.USING_LAST_SAVED_NODE_WHEN_SORTED_QUERY_INTERVALS_ARE_PROVIDED);
+//			
+//							break;
 							
 						case SEGMENT_TREE:
 							JointOverlapAnalysis.constructParallel_searchParallel_FileBased_ChromBased_SegmentTree(

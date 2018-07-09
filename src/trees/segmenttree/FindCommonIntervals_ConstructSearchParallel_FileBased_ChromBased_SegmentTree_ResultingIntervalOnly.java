@@ -1,5 +1,5 @@
 /**
- * 
+ *  This class is for SegmentTree outputs 1 intervals (only one resulting interval).
  */
 package trees.segmenttree;
 
@@ -54,62 +54,44 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_Se
 		TIntObjectMap<List<Interval>> leftPart_chrNumber2IntervalListMap = null;
 		TIntObjectMap<List<Interval>> rightPart_chrNumber2IntervalListMap = null;		
 
-		//Long timeStart,elapsedTime;
+//		//for debugging
+//		Long timeStart;
+//		Long readTime;
+//		Long constructTime;
+//		Long searchTime;
 		
 		TIntObjectMap<List<Interval>> startFileIndex_chrNumber2IntervalListMap = null;
 		
 		
 		if(startFileIndex==endFileIndex) {
-			
+						
 			startFileIndex_chrNumber2IntervalListMap = SegmentTree.fillChrNumber2OverlappingIntervalsListMap(intervalSetsFileNames[startFileIndex]);
+						
 			return startFileIndex_chrNumber2IntervalListMap;
 			
 		}else if((endFileIndex-startFileIndex)==1) {
 			
-			//timeStart = System.nanoTime();														
+			/**************************************************************************************************/																					
 			//Read file with startFileIndex
 			//Fill chr2OverlappingIntervalsListListMap using startFileIndex
-			startFileIndex_chrNumber2IntervalListMap = SegmentTree.fillChrNumber2OverlappingIntervalsListMap(intervalSetsFileNames[startFileIndex]);
-			//elapsedTime = System.nanoTime()-timeStart;	
+			startFileIndex_chrNumber2IntervalListMap = SegmentTree.fillChrNumber2OverlappingIntervalsListMap(intervalSetsFileNames[startFileIndex]);			
+			/**************************************************************************************************/				
 			
-//			//write to bufferedWriter elapsedTime as read time
-//			try {
-//				bufferedWriter.write(elapsedTime/Commons.ONE_MILLION_FLOAT + "\t");
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-
-			//timeStart = System.nanoTime();														
+			/**************************************************************************************************/								
 			//Construct parallel chrom based segment tree by reading the intervals in endFileIndex
 			TIntObjectMap<SegmentTreeNode> endFileIndex_chrNumber2SegmentTreeNodeMap = JointOverlapAnalysis.constructNormalSegmentTreeParallelInChromBased(
-					intervalSetsFileNames[endFileIndex]);
-			//elapsedTime = System.nanoTime()-timeStart;			
+					intervalSetsFileNames[endFileIndex]);			
+			/**************************************************************************************************/				
 			
-//			//write to bufferedWriter elapsedTime as construct time
-//			try {
-//				bufferedWriter.write(elapsedTime/Commons.ONE_MILLION_FLOAT + "\t");
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-			
-			//timeStart = System.nanoTime();														
+			/**************************************************************************************************/							
 			//Find overlapping intervals Search parallel chrom based
 			//Now we have search with info
 			//But in case of two files no need for search with info
 			SegmentTree.searchInParallelChromosomeBased_ResultingIntervalOnly(
 					startFileIndex_chrNumber2IntervalListMap,
-					endFileIndex_chrNumber2SegmentTreeNodeMap);
-			//elapsedTime = System.nanoTime()-timeStart;		
-			
-			
-//			//For now original. Later on remove.
-//			try {						
-//				//former it was
-//				bufferedWriter.write(elapsedTime/Commons.ONE_MILLION_FLOAT + "\t");
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-			
+					endFileIndex_chrNumber2SegmentTreeNodeMap);			
+			/**************************************************************************************************/				
+
 			return startFileIndex_chrNumber2IntervalListMap;
 			
 		} else {
@@ -143,7 +125,7 @@ public class FindCommonIntervals_ConstructSearchParallel_FileBased_ChromBased_Se
 			//We have leftPart_chrNumber2IntervalListListMap ready
 
 			//Step2
-			//Construct segment tree using each interval ın the list in right part
+			//Construct segment tree using each interval in the list in right part
 			TIntObjectMap<SegmentTreeNode> endFileIndex_chrNumber2SegmentTreeNodeMap = constructSegmentTreeParallelInChromBased(rightPart_chrNumber2IntervalListMap);
 					
 			//Step3

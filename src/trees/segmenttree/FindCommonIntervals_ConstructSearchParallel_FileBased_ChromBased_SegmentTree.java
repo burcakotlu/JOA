@@ -1,5 +1,5 @@
 /**
- * 
+ *  This class is for SegmentTree outputs n+1 intervals (all the n overlapping intervals and one resulting interval).
  */
 package trees.segmenttree;
 
