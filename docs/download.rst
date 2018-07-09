@@ -9,7 +9,7 @@ You can browse and download JOA source code from `github <https://github.com/bur
 
 Executable Jar
 ^^^^^^^^^^^^^^
-You can download JOA executable jar `joa.jar <https://www.dropbox.com/s/8ikzyqdzzem4cin/joa.jar?dl=0>`_  and run it.
+You can download JOA executable jar `joa.jar <https://www.dropbox.com/s/vflr45vk2lnxk6h/joa.jar?dl=0>`_  and run it.
 
 
 
