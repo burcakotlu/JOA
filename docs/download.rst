@@ -9,8 +9,7 @@ You can browse and download JOA source code from `github <https://github.com/bur
 
 Executable Jar
 ^^^^^^^^^^^^^^
-You can download JOA executable jar `joa.jar <https://www.dropbox.com/s/vflr45vk2lnxk6h/joa.jar?dl=0>`_  and run it.
-
+You can download JOA executable jar `joa.jar <http://burcak.ceng.metu.edu.tr/joa/>`_  and run it.
 
 
 Sample BED Files
@@ -23,6 +22,16 @@ You can download sample BED files and run JOA with them.
 +------------------------------+------------------------------------------------------------------------------------------------------+
 | Explanation                  | Sample BED Files (tar.gz)                                                                            |
 +==============================+======================================================================================================+
-| Download sample BED files    |`SampleBEDFiles.tar.gz <https://www.dropbox.com/s/ldf57avqzsirmnf/SampleBEDFiles.tar.gz?dl=0>`_       |
+| Download sample BED files    |`simulated_data.tar.gz <http://burcak.ceng.metu.edu.tr/joa/>`_                                        |
+|                              |                                                                                                      | 
+|                              |`fAdrenal-DS12528.hotspot.twopass.fdr0.05.merge.bed <http://burcak.ceng.metu.edu.tr/joa/>`_           |
+|                              |                                                                                                      |
+|                              |`fAdrenal-DS15123.hotspot.twopass.fdr0.05.merge.bed <http://burcak.ceng.metu.edu.tr/joa/>`_           |
+|                              |                                                                                                      |
+|                              |`fAdrenal-DS17319.hg19.hotspot.twopass.fdr0.05.merge.bed <http://burcak.ceng.metu.edu.tr/joa/>`_      |
+|                              |                                                                                                      |
+|                              |`fAdrenal-DS17677.hg19.hotspot.twopass.fdr0.05.merge.bed <http://burcak.ceng.metu.edu.tr/joa/>`_      |
+|                              |                                                                                                      |
+|                              |`fAdrenal-DS20343.hg19.hotspot.twopass.fdr0.05.merge.bed <http://burcak.ceng.metu.edu.tr/joa/>`_      |
 +------------------------------+------------------------------------------------------------------------------------------------------+
 
